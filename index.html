@@ -2,110 +2,70 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Web3 Contract Dashboard — React + Ethers (Single File)</title>
-  <!-- Ethers v5 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Government Budget dApp</title>
+  <!-- React & Ethers.js -->
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-  <!-- React 18 UMD + Babel for in-browser JSX -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
-    :root{
-      --bg:#0b1220; --card:#121a2b; --muted:#9fb0d1; --text:#e7efff; --accent:#5dd0ff; --good:#2ecc71; --warn:#f1c40f; --bad:#e74c3c;
-      --border: rgba(255,255,255,0.08);
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#0b1220,#0e1627 30%,#0b1220);color:var(--text)}
-    .container{max-width:1200px;margin:0 auto;padding:24px}
-    h1{font-size:28px;margin:0 0 12px;letter-spacing:0.2px}
-    .sub{color:var(--muted);margin-bottom:24px}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
-    .card{grid-column:span 12;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
-    @media(min-width:900px){.span-4{grid-column:span 4}.span-6{grid-column:span 6}.span-8{grid-column:span 8}.span-3{grid-column:span 3}}
-    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-    .btn{background:linear-gradient(90deg,#1c6cff,#4ec3ff);border:none;color:white;padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(76,175,255,0.25)}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-    .btn.secondary{background:#1b2438}
-    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0f1a32;border:1px solid var(--border);color:var(--muted);font-size:12px}
-    input, textarea, select{width:100%;background:#0f1626;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:12px}
-    textarea{min-height:120px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px}
-    label{font-size:12px;color:var(--muted)}
-    .kv{display:grid;grid-template-columns:160px 1fr;gap:8px;font-size:14px}
-    .hr{height:1px;background:var(--border);margin:12px 0}
-    .status{border-radius:12px;padding:12px;background:#0f1a32;border:1px solid var(--border);font-family:ui-monospace,monospace;white-space:pre-wrap}
-    .tabs{display:flex;gap:8px;margin-bottom:12px}
-    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:#0e1627;color:var(--muted)}
-    .tab.active{background:#193356;color:#fff;border-color:#274a7b}
-    .pill{padding:4px 8px;border-radius:999px;background:#12223f;border:1px solid var(--border);font-size:12px}
-    .function{border:1px solid var(--border);border-radius:14px;padding:12px;background:#0e1627}
-    .fn-title{font-weight:700;letter-spacing:.2px}
-    .mono{font-family:ui-monospace,monospace}
-    .muted{color:var(--muted)}
-    .ok{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
-    .small{font-size:12px}
-    .inline{display:inline-flex;gap:8px;align-items:center}
-    .scroll{max-height:260px;overflow:auto;padding-right:6px}
-    .footer{color:var(--muted);font-size:12px;margin-top:12px}
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background: #4a90e2;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #357abd;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      background: #eef;
+      font-size: 0.9em;
+    }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useMemo, useCallback } = React;
 
-    // ---------- Helpers ----------
-    const short = (addr) => addr ? addr.slice(0,6)+"…"+addr.slice(-4) : "";
-    const sleep = (ms) => new Promise(r=>setTimeout(r,ms));
-
-    // Try-catch wrapper with friendly status messages
-    async function tryTx(setStatus, fn){
-      try{ setStatus('⏳ Sending transaction…');
-        const tx = await fn();
-        setStatus(`📤 Submitted: ${tx.hash}\n⛽ Waiting for confirmations…`);
-        const rc = await tx.wait();
-        setStatus(`✅ Success in block ${rc.blockNumber}\nTx: ${tx.hash}`);
-        return rc;
-      }catch(err){
-        console.error(err);
-        const msg = err?.error?.message || err?.reason || err?.message || String(err);
-        setStatus(`❌ Error: ${msg}`);
-        throw err;
-      }
-    }
-
-    // Minimal AccessControl ABI (grant/revoke/renounce/hasRole + DEFAULT_ADMIN_ROLE)
-    const ACCESS_CONTROL_MIN_ABI = [
-      "function hasRole(bytes32 role, address account) view returns (bool)",
-      "function getRoleAdmin(bytes32 role) view returns (bytes32)",
-      "function grantRole(bytes32 role, address account)",
-      "function revokeRole(bytes32 role, address account)",
-      "function renounceRole(bytes32 role, address account)",
-      "function DEFAULT_ADMIN_ROLE() view returns (bytes32)"
-    ];
-
-    function Header({account, chainId, connect}){
-      return (
-        <div className="card">
-          <div className="row" style={{justifyContent:'space-between'}}>
-            <div>
-              <h1>Web3 Contract Dashboard</h1>
-              <div className="sub">Single-file React + Ethers UI (paste your ABI & address below)</div>
-            </div>
-            <div className="row">
-              <span className="badge mono">Network: {chainId ? chainId : '—'}</span>
-              <span className="badge mono">Account: {account ? short(account) : '—'}</span>
-              <button className="btn" onClick={connect}>{account? 'Reconnect' : 'Connect Wallet'}</button>
-            </div>
-          </div>
-        </div>
-      )
-    }
-
-    function ContractLoader({onLoaded, provider}){
-      const [addr, setAddr] = useState("");
-      const [abiText, setAbiText] = useState(`[
+    const CONTRACT_ADDRESS = "0xe8Eee31C3BcC266C0652236138678e3587F580d5"; // 🔹 Replace with your deployed contract
+    const CONTRACT_ABI =[
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -1014,325 +974,106 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-]`);
-      const [status, setStatus] = useState("");
+];
 
-      const load = useCallback(()=>{
-        try{
-          setStatus("");
-          if(!ethers.utils.isAddress(addr)) throw new Error("Invalid contract address");
-          const abi = JSON.parse(abiText);
-          const contract = new ethers.Contract(addr, abi, provider);
-          onLoaded({address: addr, abi, contract});
-        }catch(e){ setStatus("❌ " + (e.message || String(e))); }
-      }, [addr, abiText, provider, onLoaded]);
+    function App() {
+      const [provider, setProvider] = React.useState(null);
+      const [signer, setSigner] = React.useState(null);
+      const [account, setAccount] = React.useState(null);
+      const [contract, setContract] = React.useState(null);
+      const [status, setStatus] = React.useState("");
 
-      return (
-        <div className="card">
-          <div className="row" style={{justifyContent:'space-between', alignItems:'flex-start'}}>
-            <div style={{flex:1, minWidth:280, marginRight:12}}>
-              <label>Contract Address</label>
-              <input placeholder="0x…" value={addr} onChange={e=>setAddr(e.target.value.trim())} />
-              <div className="hr"></div>
-              <label>ABI JSON</label>
-              <textarea value={abiText} onChange={e=>setAbiText(e.target.value)} spellCheck={false}></textarea>
-              <div className="row" style={{marginTop:12}}>
-                <button className="btn" onClick={load}>Load Contract</button>
-                <button className="btn secondary" onClick={()=>{setAbiText(JSON.stringify(ACCESS_CONTROL_MIN_ABI,null,2));}}>Insert Minimal AccessControl ABI</button>
-              </div>
-              {status && <div className="status" style={{marginTop:10}}>{status}</div>}
-            </div>
-            <div style={{flex:1, minWidth:260}}>
-              <InfoTips />
-            </div>
-          </div>
-        </div>
-      )
-    }
+      const [department, setDepartment] = React.useState("");
+      const [budget, setBudget] = React.useState("");
+      const [spender, setSpender] = React.useState("");
+      const [amount, setAmount] = React.useState("");
+      const [balance, setBalance] = React.useState("0");
 
-    function InfoTips(){
-      return (
-        <div>
-          <h3 style={{marginTop:0}}>Quick tips</h3>
-          <ul className="small muted">
-            <li>Compile your Solidity in Remix/Foundry/Hardhat and copy the <span className="mono">ABI</span> JSON.</li>
-            <li>Paste the deployed address (Sepolia/Mainnet/local) and click <b>Load Contract</b>.</li>
-            <li>Read-only functions appear under <b>Citizen</b>. Transactions under <b>Official</b>.</li>
-            <li>Role management (grant/revoke) is under <b>Admin</b> if your contract uses OpenZeppelin AccessControl.</li>
-            <li>Status panel shows tx hash, confirmations, or errors (e.g., lack of role or wrong network).</li>
-          </ul>
-        </div>
-      )
-    }
-
-    function RolesPanel({abi, address, provider, signer, account}){
-      const [status, setStatus] = useState("");
-      const [roles, setRoles] = useState([]); // [{name, id, has}]
-      const [inputRole, setInputRole] = useState("");
-      const [target, setTarget] = useState("");
-
-      const ac = useMemo(()=>{
-        try{ return new ethers.Contract(address, ACCESS_CONTROL_MIN_ABI, provider); }
-        catch{ return null }
-      },[address, provider]);
-
-      const detectRoleConstants = useCallback(async()=>{
-        if(!ac) return;
-        const names = abi.filter(x=>x.type==='function' && x.inputs.length===0 && (x.outputs?.[0]?.type==='bytes32') && (/ROLE$/i.test(x.name) || x.name==='DEFAULT_ADMIN_ROLE')).map(x=>x.name);
-        const out = [];
-        for(const n of names){
-          try{
-            const id = await ac[n]();
-            let has = false;
-            try{ has = account ? await ac.hasRole(id, account) : false; }catch{}
-            out.push({name:n, id, has});
-          }catch{}
+      const connectWallet = async () => {
+        try {
+          if (!window.ethereum) return alert("MetaMask not found!");
+          const prov = new ethers.providers.Web3Provider(window.ethereum);
+          await prov.send("eth_requestAccounts", []);
+          const signer = prov.getSigner();
+          const addr = await signer.getAddress();
+          const cont = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+          setProvider(prov);
+          setSigner(signer);
+          setAccount(addr);
+          setContract(cont);
+          setStatus("✅ Wallet connected: " + addr);
+        } catch (err) {
+          console.error(err);
+          setStatus("❌ " + err.message);
         }
-        setRoles(out);
-      },[abi, ac, account]);
+      };
 
-      useEffect(()=>{ detectRoleConstants(); },[detectRoleConstants]);
-
-      const grant = async()=>{
-        const c = ac.connect(signer);
-        await tryTx(setStatus, ()=> c.grantRole(inputRole, target));
-        detectRoleConstants();
-      }
-      const revoke = async()=>{
-        const c = ac.connect(signer);
-        await tryTx(setStatus, ()=> c.revokeRole(inputRole, target));
-        detectRoleConstants();
-      }
-      const renounce = async()=>{
-        const c = ac.connect(signer);
-        await tryTx(setStatus, ()=> c.renounceRole(inputRole, target || account));
-        detectRoleConstants();
-      }
-
-      return (
-        <div className="card span-4">
-          <div className="row" style={{justifyContent:'space-between'}}>
-            <h3 style={{margin:0}}>Admin</h3>
-            <span className="pill">AccessControl</span>
-          </div>
-          <div className="small muted" style={{marginTop:6}}>Manage roles (requires admin privileges on-chain).</div>
-          <div className="hr"></div>
-
-          <div className="kv small">
-            <div>Detected Roles</div>
-            <div className="scroll">
-              {roles.length===0 ? <span className="muted">No role constants detected in ABI.</span> : roles.map(r=> (
-                <div key={r.name} className="row" style={{justifyContent:'space-between'}}>
-                  <span className="mono">{r.name}</span>
-                  <span className={"pill "+(r.has?"ok":"")}>{r.has?"You have" : "No"}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="hr"></div>
-          <label>Role (bytes32 hex)</label>
-          <input placeholder="0x… (e.g., DEFAULT_ADMIN_ROLE id)" value={inputRole} onChange={e=>setInputRole(e.target.value.trim())}/>
-          <label style={{marginTop:8}}>Target Address</label>
-          <input placeholder="0x…" value={target} onChange={e=>setTarget(e.target.value.trim())}/>
-          <div className="row" style={{marginTop:10}}>
-            <button className="btn" onClick={grant} disabled={!inputRole || !ethers.utils.isAddress(target)}>Grant</button>
-            <button className="btn secondary" onClick={revoke} disabled={!inputRole || !ethers.utils.isAddress(target)}>Revoke</button>
-            <button className="btn secondary" onClick={renounce} disabled={!inputRole}>Renounce</button>
-          </div>
-          <div className="status" style={{marginTop:10}}>{status || '—'}</div>
-        </div>
-      )
-    }
-
-    function ReadFunctions({contract}){
-      const [results, setResults] = useState({});
-
-      const views = useMemo(()=> (contract.interface.fragments.filter(f=> f.type==='function' && (f.stateMutability==='view' || f.stateMutability==='pure'))), [contract]);
-
-      const callFn = async (fn, idx, inputs)=>{
-        try{
-          const args = inputs.map(x=> x.value);
-          const res = await contract[fn.name](...args);
-          setResults(prev=>({...prev, [fn.name+idx]: String(res)}));
-        }catch(e){ setResults(prev=>({...prev, [fn.name+idx]: '❌ '+(e.reason||e.message)})); }
-      }
-
-      return (
-        <div className="card span-4">
-          <div className="row" style={{justifyContent:'space-between'}}>
-            <h3 style={{margin:0}}>Citizen</h3>
-            <span className="pill">Read-only</span>
-          </div>
-          <div className="scroll" style={{marginTop:10}}>
-            {views.length===0 && <div className="muted small">No view/pure functions in ABI.</div>}
-            {views.map((fn, idx)=> (
-              <div key={fn.name+idx} className="function" style={{marginBottom:10}}>
-                <div className="fn-title">{fn.name} <span className="muted small">({fn.inputs.length} input{fn.inputs.length!==1?'s':''})</span></div>
-                {fn.inputs.map((inp,i)=> (
-                  <div key={i}>
-                    <label>{inp.name || `arg${i}`} — <span className="mono">{inp.type}</span></label>
-                    <input data-key={`${fn.name+idx}-in-${i}`} placeholder={inp.type}/>
-                  </div>
-                ))}
-                <div className="row" style={{marginTop:8, justifyContent:'space-between', alignItems:'center'}}>
-                  <button className="btn" onClick={(e)=>{
-                    const inputs = fn.inputs.map((_,i)=> e.currentTarget.parentElement.parentElement.querySelector(`input[data-key='${fn.name+idx}-in-${i}']`));
-                    callFn(fn, idx, inputs);
-                  }}>Call</button>
-                  <div className="mono small">{results[fn.name+idx] || '—'}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    }
-
-    function WriteFunctions({contract, signer}){
-      const [status, setStatus] = useState("");
-
-      const writes = useMemo(()=> (contract.interface.fragments.filter(f=> f.type==='function' && !(f.stateMutability==='view' || f.stateMutability==='pure'))), [contract]);
-
-      const sendTx = async (fn, idx, inputs, payable){
-        const args = inputs.map(x=> x.value);
-        const connected = contract.connect(signer);
-        await tryTx(setStatus, ()=> payable ? connected[fn.name](...args, { value: ethers.BigNumber.from(payable) }) : connected[fn.name](...args));
-      }
-
-      return (
-        <div className="card span-4">
-          <div className="row" style={{justifyContent:'space-between'}}>
-            <h3 style={{margin:0}}>Official</h3>
-            <span className="pill">Transactions</span>
-          </div>
-          <div className="scroll" style={{marginTop:10}}>
-            {writes.length===0 && <div className="muted small">No state-changing functions in ABI.</div>}
-            {writes.map((fn, idx)=> (
-              <div key={fn.name+idx} className="function" style={{marginBottom:10}}>
-                <div className="fn-title">{fn.name} <span className="muted small">({fn.stateMutability})</span></div>
-                {fn.inputs.map((inp,i)=> (
-                  <div key={i}>
-                    <label>{inp.name || `arg${i}`} — <span className="mono">{inp.type}</span></label>
-                    <input data-key={`${fn.name+idx}-in-${i}`} placeholder={inp.type}/>
-                  </div>
-                ))}
-                {fn.stateMutability==='payable' && (
-                  <div>
-                    <label>ETH Value (wei)</label>
-                    <input data-key={`${fn.name+idx}-payable`} placeholder="0 (in wei)"/>
-                  </div>
-                )}
-                <div className="row" style={{marginTop:8, justifyContent:'space-between', alignItems:'center'}}>
-                  <button className="btn" onClick={(e)=>{
-                    const inputs = fn.inputs.map((_,i)=> e.currentTarget.parentElement.parentElement.querySelector(`input[data-key='${fn.name+idx}-in-${i}']`));
-                    const payable = fn.stateMutability==='payable' ? (e.currentTarget.parentElement.parentElement.querySelector(`input[data-key='${fn.name+idx}-payable']`)?.value || '0') : null;
-                    sendTx(fn, idx, inputs, payable);
-                  }}>Send</button>
-                  <div className="status small" style={{flex:1, marginLeft:8}}>{status || '—'}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    }
-
-    function ContractOverview({address, provider}){
-      const [balance, setBalance] = useState("0");
-      const [status, setStatus] = useState("");
-
-      const refresh = useCallback(async()=>{
-        try{
-          const b = await provider.getBalance(address);
-          setBalance(ethers.utils.formatEther(b));
-          setStatus('✅ Refreshed');
-          await sleep(600);
-          setStatus('');
-        }catch(e){ setStatus('❌ '+(e.message||String(e))); }
-      },[address, provider]);
-
-      useEffect(()=>{ refresh(); },[refresh]);
-
-      return (
-        <div className="card span-3">
-          <h3 style={{marginTop:0}}>Contract</h3>
-          <div className="kv">
-            <div>Address</div>
-            <div className="mono">{address}</div>
-            <div>Balance</div>
-            <div className="mono">{balance} ETH</div>
-          </div>
-          <div className="row" style={{marginTop:12}}>
-            <button className="btn secondary" onClick={refresh}>Refresh</button>
-            {status && <span className="pill">{status}</span>}
-          </div>
-        </div>
-      )
-    }
-
-    function Dashboard({loaded, provider, signer, account}){
-      const { address, abi, contract } = loaded;
-      return (
-        <div className="grid">
-          <ContractOverview address={address} provider={provider} />
-          <RolesPanel abi={abi} address={address} provider={provider} signer={signer} account={account} />
-          <ReadFunctions contract={contract} />
-          <WriteFunctions contract={contract} signer={signer} />
-        </div>
-      )
-    }
-
-    function App(){
-      const [provider, setProvider] = useState(null);
-      const [signer, setSigner] = useState(null);
-      const [account, setAccount] = useState(null);
-      const [chainId, setChainId] = useState(null);
-      const [loaded, setLoaded] = useState(null);
-      const [globalStatus, setGlobalStatus] = useState('');
-
-      const connect = useCallback(async()=>{
-        if(!window.ethereum){ alert('MetaMask not detected. Install the extension and reload.'); return; }
-        const web3Provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-        await web3Provider.send('eth_requestAccounts', []);
-        const s = web3Provider.getSigner();
-        const acct = await s.getAddress();
-        const network = await web3Provider.getNetwork();
-        setProvider(web3Provider); setSigner(s); setAccount(acct); setChainId(network.chainId);
-        setGlobalStatus(`🔗 Connected ${acct} on chain ${network.chainId}`);
-      },[]);
-
-      // Handle network/account changes
-      useEffect(()=>{
-        if(!window.ethereum) return;
-        const onAccounts = (accs)=>{ setAccount(accs?.[0] || null); };
-        const onChain = (cid)=>{ setChainId(Number(cid)); };
-        window.ethereum.on('accountsChanged', onAccounts);
-        window.ethereum.on('chainChanged', onChain);
-        return ()=>{
-          try{ window.ethereum.removeListener('accountsChanged', onAccounts); }catch{}
-          try{ window.ethereum.removeListener('chainChanged', onChain); }catch{}
+      const fetchBalance = async () => {
+        try {
+          if (!contract) return;
+          const bal = await contract.getContractBalance();
+          setBalance(ethers.utils.formatEther(bal));
+        } catch (err) {
+          setStatus("❌ " + err.message);
         }
-      },[]);
+      };
+
+      const allocateBudget = async () => {
+        try {
+          const tx = await contract.allocateBudget(department, ethers.utils.parseEther(budget));
+          setStatus("⏳ Transaction pending...");
+          await tx.wait();
+          setStatus("✅ Budget allocated!");
+          fetchBalance();
+        } catch (err) {
+          setStatus("❌ " + err.message);
+        }
+      };
+
+      const spendFunds = async () => {
+        try {
+          const tx = await contract.spendFunds(spender, ethers.utils.parseEther(amount));
+          setStatus("⏳ Transaction pending...");
+          await tx.wait();
+          setStatus("✅ Funds spent!");
+          fetchBalance();
+        } catch (err) {
+          setStatus("❌ " + err.message);
+        }
+      };
 
       return (
         <div className="container">
-          <Header account={account} chainId={chainId} connect={connect} />
-          {globalStatus && <div className="card status">{globalStatus}</div>}
-          <ContractLoader onLoaded={setLoaded} provider={provider || new ethers.providers.JsonRpcProvider()} />
-          {loaded && provider && signer ? (
-            <Dashboard loaded={loaded} provider={provider} signer={signer} account={account} />
-          ) : (
-            <div className="card">
-              <div className="muted">Load a contract (and connect your wallet) to enable the dashboard.</div>
-            </div>
-          )}
-          <div className="footer">💡 Pro tip: Save this file as <span class="mono">index.html</span>, open it in your browser, paste your ABI & address, and connect MetaMask.</div>
+          <h1>Government Budget dApp</h1>
+          <div className="card">
+            <h2>Wallet</h2>
+            <button onClick={connectWallet}>Connect Wallet</button>
+            <p><strong>Account:</strong> {account || "Not connected"}</p>
+            <p><strong>Contract Balance:</strong> {balance} ETH</p>
+            <button onClick={fetchBalance}>Refresh Balance</button>
+          </div>
+
+          <div className="card">
+            <h2>Admin: Allocate Budget</h2>
+            <input placeholder="Department Address" value={department} onChange={e=>setDepartment(e.target.value)} />
+            <input placeholder="Amount in ETH" value={budget} onChange={e=>setBudget(e.target.value)} />
+            <button onClick={allocateBudget}>Allocate</button>
+          </div>
+
+          <div className="card">
+            <h2>Official: Spend Funds</h2>
+            <input placeholder="Spender Address" value={spender} onChange={e=>setSpender(e.target.value)} />
+            <input placeholder="Amount in ETH" value={amount} onChange={e=>setAmount(e.target.value)} />
+            <button onClick={spendFunds}>Spend</button>
+          </div>
+
+          <div className="status">{status}</div>
         </div>
-      )
+      );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+
   </script>
 </body>
 </html>
