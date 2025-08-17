@@ -3,144 +3,738 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Government Spending Tracker</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <title>Transparent Government Budget</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.3/web3.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f9;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             color: #333;
-            line-height: 1.6;
-            padding: 2rem;
         }
+
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: #ffffff;
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 20px;
         }
-        h1, h2, h3 {
-            color: #1a365d;
-            font-weight: 600;
-        }
-        h1 {
+
+        .header {
             text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 1rem;
-        }
-        h2 {
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            color: #2d3748;
-            font-size: 1.75rem;
-        }
-        .section {
-            background-color: #f7fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #4a5568;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #4c84c1;
-            box-shadow: 0 0 0 2px rgba(76, 132, 193, 0.2);
-        }
-        .button {
-            background-color: #4c84c1;
+            margin-bottom: 40px;
             color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .connection-status {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .connect-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
             border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             font-weight: 500;
-            transition: background-color 0.2s, transform 0.1s;
+            min-width: 120px;
         }
-        .button:hover {
-            background-color: #38669d;
+
+        .tab.active {
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .button:active {
-            transform: scale(0.98);
+
+        .tab:hover {
+            background: rgba(255,255,255,0.15);
         }
-        .button:disabled {
-            background-color: #94a3b8;
+
+        .content-section {
+            display: none;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
-        .status-message {
-            margin-top: 1.5rem;
-            padding: 1rem;
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #218838);
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .proposal-card {
+            border-left-color: #28a745;
+        }
+
+        .proposal-card.pending {
+            border-left-color: #ffc107;
+        }
+
+        .proposal-card.rejected {
+            border-left-color: #dc3545;
+        }
+
+        .proposal-card.completed {
+            border-left-color: #28a745;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .milestone-list {
+            margin-top: 15px;
+        }
+
+        .milestone-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: #f8f9fa;
             border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .success {
-            background-color: #d1fae5;
-            color: #065f46;
+
+        .milestone-funded {
+            background: #d4edda;
         }
-        .error {
-            background-color: #fee2e2;
-            color: #991b1b;
+
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            font-weight: 500;
         }
-        .info {
-            background-color: #e0f2fe;
-            color: #0c4a6e;
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
-        .project-item, .spending-item {
-            border-bottom: 1px solid #e2e8f0;
-            padding: 1rem 0;
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
-        .project-item:last-child, .spending-item:last-child {
-            border-bottom: none;
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ Transparent Government Budget</h1>
+            <p>Blockchain-powered transparency in government spending</p>
+        </div>
 
-    <div id="root"></div>
+        <div class="connection-status">
+            <div id="connectionStatus">
+                <p>Connect your wallet to interact with the budget system</p>
+                <button class="connect-btn" onclick="connectWallet()">Connect Wallet</button>
+            </div>
+        </div>
 
-    <script type="text/babel">
-        // -----------------------------------------------------------------------
-        // --- CONFIGURATION: PASTE YOUR CONTRACT ADDRESS AND ABI HERE ---
-        // -----------------------------------------------------------------------
-        const CONTRACT_ADDRESS = "0x02b49f6f9d1281C07F044cd9A8d383B2998d0454"; 
-        const ABI =  [
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalBudget">0 ETH</div>
+                <div class="stat-label">Total Budget</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalSpent">0 ETH</div>
+                <div class="stat-label">Total Spent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeProposals">0</div>
+                <div class="stat-label">Active Proposals</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completedProjects">0</div>
+                <div class="stat-label">Completed Projects</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">Overview</button>
+            <button class="tab" onclick="showTab('admin')">Admin</button>
+            <button class="tab" onclick="showTab('proposals')">Proposals</button>
+            <button class="tab" onclick="showTab('milestones')">Milestones</button>
+            <button class="tab" onclick="showTab('transparency')">Transparency</button>
+        </div>
+
+        <div id="overview" class="content-section active">
+            <h2>Budget Categories</h2>
+            <div id="budgetCategories"></div>
+            
+            <h2>Recent Proposals</h2>
+            <div id="recentProposals"></div>
+        </div>
+
+        <div id="admin" class="content-section">
+            <div class="card">
+                <h3>Create Budget Category</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category Name</label>
+                        <input type="text" id="categoryName" placeholder="e.g., Healthcare, Infrastructure">
+                    </div>
+                    <div class="form-group">
+                        <label>Allocated Budget (ETH)</label>
+                        <input type="number" id="categoryBudget" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                <button class="btn" onclick="createBudgetCategory()">Create Category</button>
+            </div>
+
+            <div class="card">
+                <h3>Deposit Funds</h3>
+                <div class="form-group">
+                    <label>Amount (ETH)</label>
+                    <input type="number" id="depositAmount" step="0.01" placeholder="0.00">
+                </div>
+                <button class="btn" onclick="depositFunds()">Deposit Funds</button>
+            </div>
+
+            <div class="card">
+                <h3>Role Management</h3>
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" id="officialAddress" placeholder="0x...">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="grantOfficialRole()">Grant Official Role</button>
+                    <button class="btn btn-danger" onclick="revokeOfficialRole()">Revoke Official Role</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="proposals" class="content-section">
+            <div class="card">
+                <h3>Submit New Proposal</h3>
+                <div class="form-group">
+                    <label>Budget Category</label>
+                    <select id="proposalCategory">
+                        <option value="">Select Category</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="proposalDescription" rows="4" placeholder="Describe your proposal..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Recipient Address</label>
+                        <input type="text" id="recipientAddress" placeholder="0x...">
+                    </div>
+                    <div class="form-group">
+                        <label>Requested Amount (ETH)</label>
+                        <input type="number" id="requestedAmount" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                <button class="btn" onclick="submitProposal()">Submit Proposal</button>
+            </div>
+
+            <div class="card">
+                <h3>All Proposals</h3>
+                <div id="allProposals"></div>
+            </div>
+        </div>
+
+        <div id="milestones" class="content-section">
+            <div class="card">
+                <h3>Add Milestones to Proposal</h3>
+                <div class="form-group">
+                    <label>Proposal ID</label>
+                    <input type="number" id="milestoneProposalId" placeholder="Enter proposal ID">
+                </div>
+                <div id="milestonesContainer">
+                    <div class="milestone-input">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Milestone Description</label>
+                                <input type="text" class="milestone-desc" placeholder="Milestone description">
+                            </div>
+                            <div class="form-group">
+                                <label>Amount (ETH)</label>
+                                <input type="number" class="milestone-amount" step="0.01" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin: 15px 0;">
+                    <button class="btn btn-secondary" onclick="addMilestoneInput()">Add Milestone</button>
+                    <button class="btn" onclick="addMilestones()">Submit Milestones</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Fund Milestones</h3>
+                <div id="milestonesList"></div>
+            </div>
+        </div>
+
+        <div id="transparency" class="content-section">
+            <div class="card">
+                <h3>Flag Suspicious Proposal</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Proposal ID</label>
+                        <input type="number" id="flagProposalId" placeholder="Enter proposal ID">
+                    </div>
+                    <div class="form-group">
+                        <label>Reason for Flagging</label>
+                        <textarea id="flagReason" rows="3" placeholder="Explain why this proposal is suspicious..."></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-danger" onclick="flagProposal()">Flag Proposal</button>
+            </div>
+
+            <div class="card">
+                <h3>View Flagged Proposals</h3>
+                <div id="flaggedProposals"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for proposal details -->
+    <div id="proposalModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let web3;
+        let contract;
+        let accounts;
+        
+        // Replace with your deployed contract address
+        const CONTRACT_ADDRESS = '0xe8Eee31C3BcC266C0652236138678e3587F580d5'; // Add your contract address here
+        
+        // Contract ABI (simplified for demo)
+        const CONTRACT_ABI = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "AccessControlBadConfirmation",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "neededRole",
+				"type": "bytes32"
+			}
+		],
+		"name": "AccessControlUnauthorizedAccount",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_proposalId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_descriptions",
+				"type": "string[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "_amounts",
+				"type": "uint256[]"
+			}
+		],
+		"name": "addMilestones",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_proposalId",
+				"type": "uint256"
+			}
+		],
+		"name": "approveProposal",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
 	{
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "deptId",
+				"name": "_name",
 				"type": "string"
 			},
 			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "_totalAllocated",
 				"type": "uint256"
 			}
 		],
-		"name": "allocateBudget",
+		"name": "createBudgetCategory",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_proposalId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_reason",
+				"type": "string"
+			}
+		],
+		"name": "flagSuspiciousProposal",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_official",
+				"type": "address"
+			}
+		],
+		"name": "grantOfficialRole",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "ReentrancyGuardReentrantCall",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "categoryId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "totalAllocated",
+				"type": "uint256"
+			}
+		],
+		"name": "BudgetCreated",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "depositFunds",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_proposalId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_requiredApprovals",
+				"type": "uint256"
+			}
+		],
+		"name": "disburseEmergencyFund",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -149,10 +743,10 @@
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "deptId",
-				"type": "string"
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "proposalId",
+				"type": "uint256"
 			},
 			{
 				"indexed": false,
@@ -161,86 +755,382 @@
 				"type": "uint256"
 			}
 		],
-"name": "BudgetAllocated",
+		"name": "EmergencyFundDisbursed",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_proposalId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_milestoneIndex",
+				"type": "uint256"
+			}
+		],
+		"name": "fundMilestone",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "depositor",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "FundsDeposited",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "grantRole",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "proposalId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "milestoneIndex",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "MilestoneFunded",
 		"type": "event"
 	},
 	{
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "deptId",
-				"type": "string"
-			},
-			{
-				"indexed": false,
+				"indexed": true,
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "proposalId",
 				"type": "uint256"
 			},
 			{
 				"indexed": false,
 				"internalType": "address",
-				"name": "spender",
+				"name": "approver",
+				"type": "address"
+			}
+		],
+		"name": "ProposalApproved",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "proposalId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "flagger",
 				"type": "address"
 			},
 			{
-"indexed": false,
+				"indexed": false,
 				"internalType": "string",
-				"name": "purpose",
+				"name": "reason",
 				"type": "string"
 			}
 		],
-		"name": "FundsSpent",
+		"name": "ProposalFlagged",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "proposalId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "rejector",
+				"type": "address"
+			}
+		],
+		"name": "ProposalRejected",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "proposalId",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "budgetCategoryId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "ProposalSubmitted",
 		"type": "event"
 	},
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "deptId",
-				"type": "string"
-			},
-			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "_proposalId",
 				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "purpose",
-				"type": "string"
 			}
 		],
-		"name": "spendFunds",
+		"name": "rejectProposal",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-"inputs": [
+		"inputs": [
 			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "address",
+				"name": "callerConfirmation",
+				"type": "address"
 			}
 		],
-		"name": "budgets",
-		"outputs": [
+		"name": "renounceRole",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_official",
+				"type": "address"
+			}
+		],
+		"name": "revokeOfficialRole",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "revokeRole",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "previousAdminRole",
+				"type": "bytes32"
+			},
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "newAdminRole",
+				"type": "bytes32"
+			}
+		],
+		"name": "RoleAdminChanged",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			}
+		],
+		"name": "RoleGranted",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			}
+		],
+		"name": "RoleRevoked",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_budgetCategoryId",
+				"type": "uint256"
+			},
 			{
 				"internalType": "string",
-				"name": "deptId",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "address payable",
+				"name": "_recipient",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_requestedAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "submitProposal",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "budgetCategories",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "categoryId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
 				"type": "string"
 			},
 			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "totalAllocated",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "spentAmount",
+				"name": "totalSpent",
 				"type": "uint256"
 			},
 			{
@@ -252,69 +1142,159 @@
 		"stateMutability": "view",
 		"type": "function"
 	},
-{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "deptId",
-				"type": "string"
-			}
-		],
-		"name": "getBudgetDetails",
+	{
+		"inputs": [],
+		"name": "DEFAULT_ADMIN_ROLE",
 		"outputs": [
 			{
-				"internalType": "uint256",
-				"name": "allocated",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "spent",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "remaining",
-				"type": "uint256"
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
 			}
 		],
 		"stateMutability": "view",
 		"type": "function"
-},
+	},
 	{
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "index",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "getTransaction",
+		"name": "flaggedReasons",
 		"outputs": [
 			{
 				"internalType": "string",
-				"name": "deptId",
+				"name": "",
 				"type": "string"
-			},
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "_proposalId",
 				"type": "uint256"
-			},
+			}
+		],
+		"name": "getFlaggedReasons",
+		"outputs": [
 			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "purpose",
-				"type": "string"
-			},
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "timestamp",
-"type": "uint256"
+				"name": "_proposalId",
+				"type": "uint256"
+			}
+		],
+		"name": "getProposalDetails",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "proposalId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "budgetCategoryId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"internalType": "address payable",
+						"name": "recipient",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "requestedAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amountPaid",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum TransparentGovernmentBudget.ProposalStatus",
+						"name": "status",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "approvalCount",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct TransparentGovernmentBudget.Proposal",
+				"name": "",
+				"type": "tuple"
+			},
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "funded",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct TransparentGovernmentBudget.Milestone[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			}
+		],
+		"name": "getRoleAdmin",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
 			}
 		],
 		"stateMutability": "view",
@@ -322,12 +1302,107 @@
 	},
 	{
 		"inputs": [],
-		"name": "getTransactionCount",
+		"name": "GOV_ADMIN_ROLE",
 		"outputs": [
-{
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "role",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "hasRole",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "OFFICIAL_ROLE",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "proposalApprovals",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "proposalMilestones",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "funded",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -341,242 +1416,354 @@
 				"type": "uint256"
 			}
 		],
-		"name": "transactions",
+		"name": "proposals",
 		"outputs": [
 			{
-				"internalType": "string",
-				"name": "deptId",
-				"type": "string"
-			},
-			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "proposalId",
 				"type": "uint256"
 			},
 			{
-				"internalType": "address",
-				"name": "spender",
+				"internalType": "uint256",
+				"name": "budgetCategoryId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "address payable",
+				"name": "recipient",
 				"type": "address"
 			},
-{
-				"internalType": "string",
-				"name": "purpose",
-				"type": "string"
+			{
+				"internalType": "uint256",
+				"name": "requestedAmount",
+				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "timestamp",
+				"name": "amountPaid",
 				"type": "uint256"
+			},
+			{
+				"internalType": "enum TransparentGovernmentBudget.ProposalStatus",
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "approvalCount",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes4",
+				"name": "interfaceId",
+				"type": "bytes4"
+			}
+		],
+		"name": "supportsInterface",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
 		"type": "function"
 	}
 ];
-        // -----------------------------------------------------------------------
 
-        const { useEffect, useState } = React;
-        const roleMap = { 0: "NONE", 1: "CONTRACTOR", 2: "AUDITOR", 3: "PUBLIC" };
+        let budgetCategories = [];
+        let proposals = [];
 
-        const App = () => {
-            const [account, setAccount] = useState("");
-            const [contract, setContract] = useState(null);
-            const [userRole, setUserRole] = useState("NONE");
-            const [status, setStatus] = useState({ message: "", type: "" });
-            const [projects, setProjects] = useState([]);
-            const [spendings, setSpendings] = useState([]);
-
-            useEffect(() => {
-                checkWalletConnection();
-            }, []);
-
-            useEffect(() => {
-                if (account && contract) {
-                    fetchData();
-                }
-            }, [account, contract]);
-
-            const setStatusMessage = (message, type) => {
-                setStatus({ message, type });
-                setTimeout(() => setStatus({ message: "", type: "" }), 5000);
-            };
-
-            const checkWalletConnection = async () => {
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
                 try {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    const signer = provider.getSigner();
-                    const address = await signer.getAddress();
-                    setAccount(address);
-
-                    const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-                    setContract(contractInstance);
-
-                    window.ethereum.on('accountsChanged', (accounts) => {
-                        if (accounts.length > 0) {
-                            setAccount(accounts[0]);
-                        } else {
-                            setAccount("");
-                        }
-                    });
-                } catch (error) {
-                    setStatusMessage(`Error connecting wallet: ${error.message}`, "error");
-                }
-            };
-            
-            const fetchData = async () => {
-                if (!contract || !account) return;
-                try {
-                    const authorityAddress = await contract.authority();
-                    const userRoleCode = await contract.userRoles(account);
-                    if (account.toLowerCase() === authorityAddress.toLowerCase()) {
-                        setUserRole("AUTHORITY");
-                    } else {
-                        setUserRole(roleMap[userRoleCode]);
+                    accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    web3 = new Web3(window.ethereum);
+                    
+                    if (CONTRACT_ADDRESS !== '0x...') {
+                        contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
                     }
-
-                    const allProjects = await contract.projects();
-                    setProjects(allProjects.filter(p => p.exists)); // Filter out non-existent projects
                     
-                    const allSpendings = await contract.spendings();
-                    setSpendings(allSpendings);
+                    updateConnectionStatus();
+                    loadData();
                 } catch (error) {
-                    setStatusMessage(`Error fetching data: ${error.message}`, "error");
-                    console.error("Error fetching data:", error);
+                    showAlert('Failed to connect wallet: ' + error.message, 'error');
                 }
-            };
+            } else {
+                showAlert('Please install MetaMask to use this application', 'error');
+            }
+        }
+
+        function updateConnectionStatus() {
+            const statusDiv = document.getElementById('connectionStatus');
+            if (accounts && accounts.length > 0) {
+                statusDiv.innerHTML = `
+                    <p>✅ Connected: ${accounts[0].substring(0, 6)}...${accounts[0].substring(38)}</p>
+                    <p>Contract: ${CONTRACT_ADDRESS !== '0x...' ? 'Connected' : 'Not configured'}</p>
+                `;
+            }
+        }
+
+        async function loadData() {
+            if (!contract) {
+                // Mock data for demo purposes
+                loadMockData();
+                return;
+            }
             
-            const allocateBudget = async (e) => {
-                e.preventDefault();
-                const name = e.target.name.value;
-                const amount = ethers.utils.parseEther(e.target.amount.value);
-                setStatusMessage("Allocating budget...", "info");
-                try {
-                    const tx = await contract.allocateBudget(name, amount);
-                    await tx.wait();
-                    setStatusMessage("Budget allocated successfully!", "success");
-                    fetchData();
-                } catch (error) {
-                    setStatusMessage(`Error: ${error.message}`, "error");
+            try {
+                // Load real contract data here
+                await loadBudgetCategories();
+                await loadProposals();
+                await updateStats();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                loadMockData();
+            }
+        }
+
+        function loadMockData() {
+            // Mock budget categories
+            budgetCategories = [
+                { id: 1, name: 'Healthcare', totalAllocated: 100, totalSpent: 45 },
+                { id: 2, name: 'Infrastructure', totalAllocated: 150, totalSpent: 80 },
+                { id: 3, name: 'Education', totalAllocated: 80, totalSpent: 30 }
+            ];
+
+            // Mock proposals
+            proposals = [
+                {
+                    id: 1,
+                    categoryId: 1,
+                    description: 'New Hospital Equipment',
+                    recipient: '0x1234...5678',
+                    requestedAmount: 25,
+                    amountPaid: 0,
+                    status: 'PENDING'
+                },
+                {
+                    id: 2,
+                    categoryId: 2,
+                    description: 'Road Maintenance Project',
+                    recipient: '0x2345...6789',
+                    requestedAmount: 40,
+                    amountPaid: 40,
+                    status: 'COMPLETED'
                 }
-            };
+            ];
 
-            const logSpending = async (e) => {
-                e.preventDefault();
-                const projectId = e.target.projectId.value;
-                const amount = ethers.utils.parseEther(e.target.amount.value);
-                const description = e.target.description.value;
-                const receiver = e.target.receiver.value;
-                setStatusMessage("Logging spending...", "info");
-                try {
-                    const tx = await contract.logSpending(projectId, amount, description, receiver);
-                    await tx.wait();
-                    setStatusMessage("Spending logged successfully!", "success");
-                    fetchData();
-                } catch (error) {
-                    setStatusMessage(`Error: ${error.message}`, "error");
-                }
-            };
+            updateUI();
+        }
 
-            return (
-                <div className="container">
-                    <h1>Government Spending Tracker</h1>
-                    <div className="section">
-                        <h2>Wallet & Role Info</h2>
-                        <p><strong>Connected Account:</strong> {account || "Not connected"}</p>
-                        <p><strong>Your Role:</strong> {userRole}</p>
-                        {!account && (
-                            <button className="button" onClick={checkWalletConnection}>Connect Wallet</button>
-                        )}
-                        {status.message && (
-                            <div className={`status-message ${status.type}`}>
-                                {status.message}
-                            </div>
-                        )}
-                    </div>
+        function updateUI() {
+            displayBudgetCategories();
+            displayProposals();
+            updateStats();
+            populateCategoryDropdown();
+        }
 
-                    {userRole === "AUTHORITY" && (
-                        <div className="section">
-                            <h2>🏛️ Authority Dashboard</h2>
-                            <form onSubmit={allocateBudget}>
-                                <h3>Allocate New Budget</h3>
-                                <div className="form-group">
-                                    <label>Project Name:</label>
-                                    <input type="text" name="name" required />
-                                </div>
-                                <div className="form-group">
-                                    <label>Budget Amount (ETH):</label>
-                                    <input type="number" step="0.01" name="amount" required />
-                                </div>
-                                <button className="button" type="submit">Allocate Budget</button>
-                            </form>
+        function displayBudgetCategories() {
+            const container = document.getElementById('budgetCategories');
+            container.innerHTML = budgetCategories.map(category => `
+                <div class="card">
+                    <h3>${category.name}</h3>
+                    <div class="form-row">
+                        <div>
+                            <strong>Allocated:</strong> ${category.totalAllocated} ETH
                         </div>
-                    )}
-                    
-                    {(userRole === "CONTRACTOR" || userRole === "AUDITOR") && (
-                        <div className="section">
-                            <h2>✍️ Authorized Actions</h2>
-                            <form onSubmit={logSpending}>
-                                <h3>Log Spending for a Project</h3>
-                                <div className="form-group">
-                                    <label>Project ID:</label>
-                                    <input type="number" name="projectId" required />
-                                </div>
-                                <div className="form-group">
-                                    <label>Amount Spent (ETH):</label>
-                                    <input type="number" step="0.01" name="amount" required />
-                                </div>
-                                <div className="form-group">
-                                    <label>Description:</label>
-                                    <textarea name="description" required></textarea>
-                                </div>
-                                <div className="form-group">
-                                    <label>Receiver Address:</label>
-                                    <input type="text" name="receiver" required />
-                                </div>
-                                <button className="button" type="submit">Log Spending</button>
-                            </form>
+                        <div>
+                            <strong>Spent:</strong> ${category.totalSpent} ETH
                         </div>
-                    )}
-
-                    <div className="section">
-                        <h2>📊 Public Project Budgets</h2>
-                        {projects.length === 0 ? (
-                            <p>No projects have been created yet.</p>
-                        ) : (
-                            projects.map((p, index) => (
-                                <div key={index} className="project-item">
-                                    <h3>Project ID: {index} - {p.name}</h3>
-                                    <p><strong>Total Budget:</strong> {ethers.utils.formatEther(p.totalBudget)} ETH</p>
-                                    <p><strong>Amount Spent:</strong> {ethers.utils.formatEther(p.spentAmount)} ETH</p>
-                                    <p><strong>Remaining:</strong> {ethers.utils.formatEther(p.totalBudget.sub(p.spentAmount))} ETH</p>
-                                </div>
-                            ))
-                        )}
+                        <div>
+                            <strong>Remaining:</strong> ${(category.totalAllocated - category.totalSpent)} ETH
+                        </div>
                     </div>
-
-                    <div className="section">
-                        <h2>🧾 Public Spending Logs</h2>
-                        {spendings.length === 0 ? (
-                            <p>No spending has been logged yet.</p>
-                        ) : (
-                            spendings.map((s, index) => (
-                                <div key={index} className="spending-item">
-                                    <p><strong>Log ID:</strong> {index}</p>
-                                    <p><strong>Project ID:</strong> {s.projectId.toString()}</p>
-                                    <p><strong>Amount:</strong> {ethers.utils.formatEther(s.amount)} ETH</p>
-                                    <p><strong>Description:</strong> {s.description}</p>
-                                    <p><strong>Receiver:</strong> {s.receiver}</p>
-                                    <p><strong>Timestamp:</strong> {new Date(s.timestamp.toNumber() * 1000).toLocaleString()}</p>
-                                </div>
-                            ))
-                        )}
+                    <div style="margin-top: 10px; background: #f8f9fa; height: 10px; border-radius: 5px;">
+                        <div style="background: linear-gradient(45deg, #28a745, #20c997); height: 100%; width: ${(category.totalSpent / category.totalAllocated) * 100}%; border-radius: 5px;"></div>
                     </div>
                 </div>
-            );
-        };
+            `).join('');
+        }
 
-        ReactDOM.render(<App />, document.getElementById('root'));
-    </script>
-</body>
-</html>
+        function displayProposals() {
+            const recentContainer = document.getElementById('recentProposals');
+            const allContainer = document.getElementById('allProposals');
+            
+            const proposalHTML = proposals.map(proposal => {
+                const category = budgetCategories.find(c => c.id === proposal.categoryId);
+                return `
+                    <div class="card proposal-card ${proposal.status.toLowerCase()}">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 15px;">
+                            <h3>Proposal #${proposal.id}</h3>
+                            <span class="status-badge status-${proposal.status.toLowerCase()}">${proposal.status}</span>
+                        </div>
+                        <p><strong>Category:</strong> ${category ? category.name : 'Unknown'}</p>
+                        <p><strong>Description:</strong> ${proposal.description}</p>
+                        <p><strong>Recipient:</strong> ${proposal.recipient}</p>
+                        <p><strong>Amount:</strong> ${proposal.requestedAmount} ETH</p>
+                        <p><strong>Paid:</strong> ${proposal.amountPaid} ETH</p>
+                        
+                        <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            ${proposal.status === 'PENDING' ? `
+                                <button class="btn btn-success" onclick="approveProposal(${proposal.id})">Approve</button>
+                                <button class="btn btn-danger" onclick="rejectProposal(${proposal.id})">Reject</button>
+                            ` : ''}
+                            <button class="btn btn-secondary" onclick="viewProposalDetails(${proposal.id})">View Details</button>
+                            <button class="btn btn-danger" onclick="showFlagModal(${proposal.id})">Flag</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            recentContainer.innerHTML = proposalHTML;
+            allContainer.innerHTML = proposalHTML;
+        }
+
+        function updateStats() {
+            const totalBudget = budgetCategories.reduce((sum, cat) => sum + cat.totalAllocated, 0);
+            const totalSpent = budgetCategories.reduce((sum, cat) => sum + cat.totalSpent, 0);
+            const activeProposals = proposals.filter(p => p.status === 'PENDING' || p.status === 'APPROVED').length;
+            const completedProjects = proposals.filter(p => p.status === 'COMPLETED').length;
+
+            document.getElementById('totalBudget').textContent = `${totalBudget} ETH`;
+            document.getElementById('totalSpent').textContent = `${totalSpent} ETH`;
+            document.getElementById('activeProposals').textContent = activeProposals;
+            document.getElementById('completedProjects').textContent = completedProjects;
+        }
+
+        function populateCategoryDropdown() {
+            const select = document.getElementById('proposalCategory');
+            select.innerHTML = '<option value="">Select Category</option>' +
+                budgetCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        }
+
+        async function createBudgetCategory() {
+            const name = document.getElementById('categoryName').value;
+            const budget = document.getElementById('categoryBudget').value;
+
+            if (!name || !budget) {
+                showAlert('Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                if (contract) {
+                    const result = await contract.methods.createBudgetCategory(name, web3.utils.toWei(budget, 'ether'))
+                        .send({ from: accounts[0] });
+                    showAlert('Budget category created successfully!', 'success');
+                } else {
+                    // Mock creation
+                    const newCategory = {
+                        id: budgetCategories.length + 1,
+                        name: name,
+                        totalAllocated: parseFloat(budget),
+                        totalSpent: 0
+                    };
+                    budgetCategories.push(newCategory);
+                    showAlert('Budget category created successfully! (Demo mode)', 'success');
+                }
+
+                document.getElementById('categoryName').value = '';
+                document.getElementById('categoryBudget').value = '';
+                updateUI();
+            } catch (error) {
+                showAlert('Error creating category: ' + error.message, 'error');
+            }
+        }
+
+        async function depositFunds() {
+            const amount = document.getElementById('depositAmount').value;
+
+            if (!amount) {
+                showAlert('Please enter an amount', 'error');
+                return;
+            }
+
+            try {
+                if (contract) {
+                    await contract.methods.depositFunds()
+                        .send({ from: accounts[0], value: web3.utils.toWei(amount, 'ether') });
+                    showAlert('Funds deposited successfully!', 'success');
+                } else {
+                    showAlert('Funds deposited successfully! (Demo mode)', 'success');
+                }
+
+                document.getElementById('depositAmount').value = '';
+            } catch (error) {
+                showAlert('Error depositing funds: ' + error.message, 'error');
+            }
+        }
+
+        async function submitProposal() {
+            const categoryId = document.getElementById('proposalCategory').value;
+            const description = document.getElementById('proposalDescription').value;
+            const recipient = document.getElementById('recipientAddress').value;
+            const amount = document.getElementById('requestedAmount').value;
+
+            if (!categoryId || !description || !recipient || !amount) {
+                showAlert('Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                if (contract) {
+                    await contract.methods.submitProposal(categoryId, description, recipient, web3.utils.toWei(amount, 'ether'))
+                        .send({ from: accounts[0] });
+                    showAlert('Proposal submitted successfully!', 'success');
+                } else {
+                    // Mock submission
+                    const newProposal = {
+                        id: proposals.length + 1,
+                        categoryId: parseInt(categoryId),
+                        description: description,
+                        recipient: recipient,
+                        requestedAmount: parseFloat(amount),
+                        amountPaid: 0,
+                        status: 'PENDING'
+                    };
+                    proposals.push(newProposal);
+                    showAlert('Proposal submitted successfully! (Demo mode)', 'success');
+                }
+
+                // Clear form
+                document.getElementById('proposalCategory').value = '';
+                document.getElementById('proposalDescription').value = '';
+                document.getElementById('recipientAddress').value = '';
+                document.getElementById('requestedAmount').value = '';
+                updateUI();
+            } catch (error) {
+                showAlert('Error submitting proposal: ' + error.message, 'error');
+            }
+        }
+
+        async function approveProposal(proposalId) {
+            try {
+                if (contract) {
+                    await contract.methods.approveProposal(proposalId).send({ from: accounts[0] });
+                    showAlert('Proposal approved successfully!', 'success');
+                } else {
+                    const proposal = proposals.find(p => p.id === proposalId);
+                    if (proposal) {
+                        proposal.status = 'APPROVED';
+                        showAlert('Proposal approved successfully! (Demo mode)', 'success');
+                    }
+                }
+                updateUI();
+            } catch (error) {
+                showAlert('Error approving proposal: ' + error.message, 'error');
+            }
+        }
+
+        async function rejectPropo
