@@ -1,578 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transparent Government Budget</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.3/web3.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .connection-status {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            text-align: center;
-            color: white;
-        }
-
-        .connect-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .connect-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-
-        .tabs {
-            display: flex;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 5px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 12px 20px;
-            background: transparent;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            min-width: 120px;
-        }
-
-        .tab.active {
-            background: rgba(255,255,255,0.2);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .tab:hover {
-            background: rgba(255,255,255,0.15);
-        }
-
-        .content-section {
-            display: none;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(45deg, #6c757d, #5a6268);
-        }
-
-        .btn-danger {
-            background: linear-gradient(45deg, #dc3545, #c82333);
-        }
-
-        .btn-success {
-            background: linear-gradient(45deg, #28a745, #218838);
-        }
-
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 4px solid #667eea;
-        }
-
-        .card h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .proposal-card {
-            border-left-color: #28a745;
-        }
-
-        .proposal-card.pending {
-            border-left-color: #ffc107;
-        }
-
-        .proposal-card.rejected {
-            border-left-color: #dc3545;
-        }
-
-        .proposal-card.completed {
-            border-left-color: #28a745;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-approved {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .status-rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-completed {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .milestone-list {
-            margin-top: 15px;
-        }
-
-        .milestone-item {
-            padding: 10px;
-            margin: 8px 0;
-            background: #f8f9fa;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .milestone-funded {
-            background: #d4edda;
-        }
-
-        .alert {
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 10px;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 20px;
-            width: 80%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: #000;
-        }
-
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .tabs {
-                flex-direction: column;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web3 Contract Dashboard — React + Ethers (Single File)</title>
+  <!-- Ethers v5 -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <!-- React 18 UMD + Babel for in-browser JSX -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#121a2b; --muted:#9fb0d1; --text:#e7efff; --accent:#5dd0ff; --good:#2ecc71; --warn:#f1c40f; --bad:#e74c3c;
+      --border: rgba(255,255,255,0.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#0b1220,#0e1627 30%,#0b1220);color:var(--text)}
+    .container{max-width:1200px;margin:0 auto;padding:24px}
+    h1{font-size:28px;margin:0 0 12px;letter-spacing:0.2px}
+    .sub{color:var(--muted);margin-bottom:24px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{grid-column:span 12;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+    @media(min-width:900px){.span-4{grid-column:span 4}.span-6{grid-column:span 6}.span-8{grid-column:span 8}.span-3{grid-column:span 3}}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .btn{background:linear-gradient(90deg,#1c6cff,#4ec3ff);border:none;color:white;padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(76,175,255,0.25)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .btn.secondary{background:#1b2438}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0f1a32;border:1px solid var(--border);color:var(--muted);font-size:12px}
+    input, textarea, select{width:100%;background:#0f1626;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:12px}
+    textarea{min-height:120px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px}
+    label{font-size:12px;color:var(--muted)}
+    .kv{display:grid;grid-template-columns:160px 1fr;gap:8px;font-size:14px}
+    .hr{height:1px;background:var(--border);margin:12px 0}
+    .status{border-radius:12px;padding:12px;background:#0f1a32;border:1px solid var(--border);font-family:ui-monospace,monospace;white-space:pre-wrap}
+    .tabs{display:flex;gap:8px;margin-bottom:12px}
+    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:#0e1627;color:var(--muted)}
+    .tab.active{background:#193356;color:#fff;border-color:#274a7b}
+    .pill{padding:4px 8px;border-radius:999px;background:#12223f;border:1px solid var(--border);font-size:12px}
+    .function{border:1px solid var(--border);border-radius:14px;padding:12px;background:#0e1627}
+    .fn-title{font-weight:700;letter-spacing:.2px}
+    .mono{font-family:ui-monospace,monospace}
+    .muted{color:var(--muted)}
+    .ok{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+    .small{font-size:12px}
+    .inline{display:inline-flex;gap:8px;align-items:center}
+    .scroll{max-height:260px;overflow:auto;padding-right:6px}
+    .footer{color:var(--muted);font-size:12px;margin-top:12px}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏛️ Transparent Government Budget</h1>
-            <p>Blockchain-powered transparency in government spending</p>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useCallback } = React;
+
+    // ---------- Helpers ----------
+    const short = (addr) => addr ? addr.slice(0,6)+"…"+addr.slice(-4) : "";
+    const sleep = (ms) => new Promise(r=>setTimeout(r,ms));
+
+    // Try-catch wrapper with friendly status messages
+    async function tryTx(setStatus, fn){
+      try{ setStatus('⏳ Sending transaction…');
+        const tx = await fn();
+        setStatus(`📤 Submitted: ${tx.hash}\n⛽ Waiting for confirmations…`);
+        const rc = await tx.wait();
+        setStatus(`✅ Success in block ${rc.blockNumber}\nTx: ${tx.hash}`);
+        return rc;
+      }catch(err){
+        console.error(err);
+        const msg = err?.error?.message || err?.reason || err?.message || String(err);
+        setStatus(`❌ Error: ${msg}`);
+        throw err;
+      }
+    }
+
+    // Minimal AccessControl ABI (grant/revoke/renounce/hasRole + DEFAULT_ADMIN_ROLE)
+    const ACCESS_CONTROL_MIN_ABI = [
+      "function hasRole(bytes32 role, address account) view returns (bool)",
+      "function getRoleAdmin(bytes32 role) view returns (bytes32)",
+      "function grantRole(bytes32 role, address account)",
+      "function revokeRole(bytes32 role, address account)",
+      "function renounceRole(bytes32 role, address account)",
+      "function DEFAULT_ADMIN_ROLE() view returns (bytes32)"
+    ];
+
+    function Header({account, chainId, connect}){
+      return (
+        <div className="card">
+          <div className="row" style={{justifyContent:'space-between'}}>
+            <div>
+              <h1>Web3 Contract Dashboard</h1>
+              <div className="sub">Single-file React + Ethers UI (paste your ABI & address below)</div>
+            </div>
+            <div className="row">
+              <span className="badge mono">Network: {chainId ? chainId : '—'}</span>
+              <span className="badge mono">Account: {account ? short(account) : '—'}</span>
+              <button className="btn" onClick={connect}>{account? 'Reconnect' : 'Connect Wallet'}</button>
+            </div>
+          </div>
         </div>
+      )
+    }
 
-        <div class="connection-status">
-            <div id="connectionStatus">
-                <p>Connect your wallet to interact with the budget system</p>
-                <button class="connect-btn" onclick="connectWallet()">Connect Wallet</button>
-            </div>
-        </div>
-
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card">
-                <div class="stat-value" id="totalBudget">0 ETH</div>
-                <div class="stat-label">Total Budget</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="totalSpent">0 ETH</div>
-                <div class="stat-label">Total Spent</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="activeProposals">0</div>
-                <div class="stat-label">Active Proposals</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="completedProjects">0</div>
-                <div class="stat-label">Completed Projects</div>
-            </div>
-        </div>
-
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('overview')">Overview</button>
-            <button class="tab" onclick="showTab('admin')">Admin</button>
-            <button class="tab" onclick="showTab('proposals')">Proposals</button>
-            <button class="tab" onclick="showTab('milestones')">Milestones</button>
-            <button class="tab" onclick="showTab('transparency')">Transparency</button>
-        </div>
-
-        <div id="overview" class="content-section active">
-            <h2>Budget Categories</h2>
-            <div id="budgetCategories"></div>
-            
-            <h2>Recent Proposals</h2>
-            <div id="recentProposals"></div>
-        </div>
-
-        <div id="admin" class="content-section">
-            <div class="card">
-                <h3>Create Budget Category</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Category Name</label>
-                        <input type="text" id="categoryName" placeholder="e.g., Healthcare, Infrastructure">
-                    </div>
-                    <div class="form-group">
-                        <label>Allocated Budget (ETH)</label>
-                        <input type="number" id="categoryBudget" step="0.01" placeholder="0.00">
-                    </div>
-                </div>
-                <button class="btn" onclick="createBudgetCategory()">Create Category</button>
-            </div>
-
-            <div class="card">
-                <h3>Deposit Funds</h3>
-                <div class="form-group">
-                    <label>Amount (ETH)</label>
-                    <input type="number" id="depositAmount" step="0.01" placeholder="0.00">
-                </div>
-                <button class="btn" onclick="depositFunds()">Deposit Funds</button>
-            </div>
-
-            <div class="card">
-                <h3>Role Management</h3>
-                <div class="form-group">
-                    <label>Address</label>
-                    <input type="text" id="officialAddress" placeholder="0x...">
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn" onclick="grantOfficialRole()">Grant Official Role</button>
-                    <button class="btn btn-danger" onclick="revokeOfficialRole()">Revoke Official Role</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="proposals" class="content-section">
-            <div class="card">
-                <h3>Submit New Proposal</h3>
-                <div class="form-group">
-                    <label>Budget Category</label>
-                    <select id="proposalCategory">
-                        <option value="">Select Category</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="proposalDescription" rows="4" placeholder="Describe your proposal..."></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Recipient Address</label>
-                        <input type="text" id="recipientAddress" placeholder="0x...">
-                    </div>
-                    <div class="form-group">
-                        <label>Requested Amount (ETH)</label>
-                        <input type="number" id="requestedAmount" step="0.01" placeholder="0.00">
-                    </div>
-                </div>
-                <button class="btn" onclick="submitProposal()">Submit Proposal</button>
-            </div>
-
-            <div class="card">
-                <h3>All Proposals</h3>
-                <div id="allProposals"></div>
-            </div>
-        </div>
-
-        <div id="milestones" class="content-section">
-            <div class="card">
-                <h3>Add Milestones to Proposal</h3>
-                <div class="form-group">
-                    <label>Proposal ID</label>
-                    <input type="number" id="milestoneProposalId" placeholder="Enter proposal ID">
-                </div>
-                <div id="milestonesContainer">
-                    <div class="milestone-input">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Milestone Description</label>
-                                <input type="text" class="milestone-desc" placeholder="Milestone description">
-                            </div>
-                            <div class="form-group">
-                                <label>Amount (ETH)</label>
-                                <input type="number" class="milestone-amount" step="0.01" placeholder="0.00">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px; margin: 15px 0;">
-                    <button class="btn btn-secondary" onclick="addMilestoneInput()">Add Milestone</button>
-                    <button class="btn" onclick="addMilestones()">Submit Milestones</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>Fund Milestones</h3>
-                <div id="milestonesList"></div>
-            </div>
-        </div>
-
-        <div id="transparency" class="content-section">
-            <div class="card">
-                <h3>Flag Suspicious Proposal</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Proposal ID</label>
-                        <input type="number" id="flagProposalId" placeholder="Enter proposal ID">
-                    </div>
-                    <div class="form-group">
-                        <label>Reason for Flagging</label>
-                        <textarea id="flagReason" rows="3" placeholder="Explain why this proposal is suspicious..."></textarea>
-                    </div>
-                </div>
-                <button class="btn btn-danger" onclick="flagProposal()">Flag Proposal</button>
-            </div>
-
-            <div class="card">
-                <h3>View Flagged Proposals</h3>
-                <div id="flaggedProposals"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal for proposal details -->
-    <div id="proposalModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="modalContent"></div>
-        </div>
-    </div>
-
-    <script>
-        let web3;
-        let contract;
-        let accounts;
-        
-        // Replace with your deployed contract address
-        const CONTRACT_ADDRESS = '0xe8Eee31C3BcC266C0652236138678e3587F580d5'; // Add your contract address here
-        
-        // Contract ABI (simplified for demo)
-        const CONTRACT_ABI = [
+    function ContractLoader({onLoaded, provider}){
+      const [addr, setAddr] = useState("");
+      const [abiText, setAbiText] = useState(`[
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -1481,289 +1014,325 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-];
+]`);
+      const [status, setStatus] = useState("");
 
-        let budgetCategories = [];
-        let proposals = [];
+      const load = useCallback(()=>{
+        try{
+          setStatus("");
+          if(!ethers.utils.isAddress(addr)) throw new Error("Invalid contract address");
+          const abi = JSON.parse(abiText);
+          const contract = new ethers.Contract(addr, abi, provider);
+          onLoaded({address: addr, abi, contract});
+        }catch(e){ setStatus("❌ " + (e.message || String(e))); }
+      }, [addr, abiText, provider, onLoaded]);
 
-        async function connectWallet() {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    web3 = new Web3(window.ethereum);
-                    
-                    if (CONTRACT_ADDRESS !== '0x...') {
-                        contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-                    }
-                    
-                    updateConnectionStatus();
-                    loadData();
-                } catch (error) {
-                    showAlert('Failed to connect wallet: ' + error.message, 'error');
-                }
-            } else {
-                showAlert('Please install MetaMask to use this application', 'error');
-            }
+      return (
+        <div className="card">
+          <div className="row" style={{justifyContent:'space-between', alignItems:'flex-start'}}>
+            <div style={{flex:1, minWidth:280, marginRight:12}}>
+              <label>Contract Address</label>
+              <input placeholder="0x…" value={addr} onChange={e=>setAddr(e.target.value.trim())} />
+              <div className="hr"></div>
+              <label>ABI JSON</label>
+              <textarea value={abiText} onChange={e=>setAbiText(e.target.value)} spellCheck={false}></textarea>
+              <div className="row" style={{marginTop:12}}>
+                <button className="btn" onClick={load}>Load Contract</button>
+                <button className="btn secondary" onClick={()=>{setAbiText(JSON.stringify(ACCESS_CONTROL_MIN_ABI,null,2));}}>Insert Minimal AccessControl ABI</button>
+              </div>
+              {status && <div className="status" style={{marginTop:10}}>{status}</div>}
+            </div>
+            <div style={{flex:1, minWidth:260}}>
+              <InfoTips />
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    function InfoTips(){
+      return (
+        <div>
+          <h3 style={{marginTop:0}}>Quick tips</h3>
+          <ul className="small muted">
+            <li>Compile your Solidity in Remix/Foundry/Hardhat and copy the <span className="mono">ABI</span> JSON.</li>
+            <li>Paste the deployed address (Sepolia/Mainnet/local) and click <b>Load Contract</b>.</li>
+            <li>Read-only functions appear under <b>Citizen</b>. Transactions under <b>Official</b>.</li>
+            <li>Role management (grant/revoke) is under <b>Admin</b> if your contract uses OpenZeppelin AccessControl.</li>
+            <li>Status panel shows tx hash, confirmations, or errors (e.g., lack of role or wrong network).</li>
+          </ul>
+        </div>
+      )
+    }
+
+    function RolesPanel({abi, address, provider, signer, account}){
+      const [status, setStatus] = useState("");
+      const [roles, setRoles] = useState([]); // [{name, id, has}]
+      const [inputRole, setInputRole] = useState("");
+      const [target, setTarget] = useState("");
+
+      const ac = useMemo(()=>{
+        try{ return new ethers.Contract(address, ACCESS_CONTROL_MIN_ABI, provider); }
+        catch{ return null }
+      },[address, provider]);
+
+      const detectRoleConstants = useCallback(async()=>{
+        if(!ac) return;
+        const names = abi.filter(x=>x.type==='function' && x.inputs.length===0 && (x.outputs?.[0]?.type==='bytes32') && (/ROLE$/i.test(x.name) || x.name==='DEFAULT_ADMIN_ROLE')).map(x=>x.name);
+        const out = [];
+        for(const n of names){
+          try{
+            const id = await ac[n]();
+            let has = false;
+            try{ has = account ? await ac.hasRole(id, account) : false; }catch{}
+            out.push({name:n, id, has});
+          }catch{}
         }
+        setRoles(out);
+      },[abi, ac, account]);
 
-        function updateConnectionStatus() {
-            const statusDiv = document.getElementById('connectionStatus');
-            if (accounts && accounts.length > 0) {
-                statusDiv.innerHTML = `
-                    <p>✅ Connected: ${accounts[0].substring(0, 6)}...${accounts[0].substring(38)}</p>
-                    <p>Contract: ${CONTRACT_ADDRESS !== '0x...' ? 'Connected' : 'Not configured'}</p>
-                `;
-            }
-        }
+      useEffect(()=>{ detectRoleConstants(); },[detectRoleConstants]);
 
-        async function loadData() {
-            if (!contract) {
-                // Mock data for demo purposes
-                loadMockData();
-                return;
-            }
-            
-            try {
-                // Load real contract data here
-                await loadBudgetCategories();
-                await loadProposals();
-                await updateStats();
-            } catch (error) {
-                console.error('Error loading data:', error);
-                loadMockData();
-            }
-        }
+      const grant = async()=>{
+        const c = ac.connect(signer);
+        await tryTx(setStatus, ()=> c.grantRole(inputRole, target));
+        detectRoleConstants();
+      }
+      const revoke = async()=>{
+        const c = ac.connect(signer);
+        await tryTx(setStatus, ()=> c.revokeRole(inputRole, target));
+        detectRoleConstants();
+      }
+      const renounce = async()=>{
+        const c = ac.connect(signer);
+        await tryTx(setStatus, ()=> c.renounceRole(inputRole, target || account));
+        detectRoleConstants();
+      }
 
-        function loadMockData() {
-            // Mock budget categories
-            budgetCategories = [
-                { id: 1, name: 'Healthcare', totalAllocated: 100, totalSpent: 45 },
-                { id: 2, name: 'Infrastructure', totalAllocated: 150, totalSpent: 80 },
-                { id: 3, name: 'Education', totalAllocated: 80, totalSpent: 30 }
-            ];
+      return (
+        <div className="card span-4">
+          <div className="row" style={{justifyContent:'space-between'}}>
+            <h3 style={{margin:0}}>Admin</h3>
+            <span className="pill">AccessControl</span>
+          </div>
+          <div className="small muted" style={{marginTop:6}}>Manage roles (requires admin privileges on-chain).</div>
+          <div className="hr"></div>
 
-            // Mock proposals
-            proposals = [
-                {
-                    id: 1,
-                    categoryId: 1,
-                    description: 'New Hospital Equipment',
-                    recipient: '0x1234...5678',
-                    requestedAmount: 25,
-                    amountPaid: 0,
-                    status: 'PENDING'
-                },
-                {
-                    id: 2,
-                    categoryId: 2,
-                    description: 'Road Maintenance Project',
-                    recipient: '0x2345...6789',
-                    requestedAmount: 40,
-                    amountPaid: 40,
-                    status: 'COMPLETED'
-                }
-            ];
-
-            updateUI();
-        }
-
-        function updateUI() {
-            displayBudgetCategories();
-            displayProposals();
-            updateStats();
-            populateCategoryDropdown();
-        }
-
-        function displayBudgetCategories() {
-            const container = document.getElementById('budgetCategories');
-            container.innerHTML = budgetCategories.map(category => `
-                <div class="card">
-                    <h3>${category.name}</h3>
-                    <div class="form-row">
-                        <div>
-                            <strong>Allocated:</strong> ${category.totalAllocated} ETH
-                        </div>
-                        <div>
-                            <strong>Spent:</strong> ${category.totalSpent} ETH
-                        </div>
-                        <div>
-                            <strong>Remaining:</strong> ${(category.totalAllocated - category.totalSpent)} ETH
-                        </div>
-                    </div>
-                    <div style="margin-top: 10px; background: #f8f9fa; height: 10px; border-radius: 5px;">
-                        <div style="background: linear-gradient(45deg, #28a745, #20c997); height: 100%; width: ${(category.totalSpent / category.totalAllocated) * 100}%; border-radius: 5px;"></div>
-                    </div>
+          <div className="kv small">
+            <div>Detected Roles</div>
+            <div className="scroll">
+              {roles.length===0 ? <span className="muted">No role constants detected in ABI.</span> : roles.map(r=> (
+                <div key={r.name} className="row" style={{justifyContent:'space-between'}}>
+                  <span className="mono">{r.name}</span>
+                  <span className={"pill "+(r.has?"ok":"")}>{r.has?"You have" : "No"}</span>
                 </div>
-            `).join('');
+              ))}
+            </div>
+          </div>
+
+          <div className="hr"></div>
+          <label>Role (bytes32 hex)</label>
+          <input placeholder="0x… (e.g., DEFAULT_ADMIN_ROLE id)" value={inputRole} onChange={e=>setInputRole(e.target.value.trim())}/>
+          <label style={{marginTop:8}}>Target Address</label>
+          <input placeholder="0x…" value={target} onChange={e=>setTarget(e.target.value.trim())}/>
+          <div className="row" style={{marginTop:10}}>
+            <button className="btn" onClick={grant} disabled={!inputRole || !ethers.utils.isAddress(target)}>Grant</button>
+            <button className="btn secondary" onClick={revoke} disabled={!inputRole || !ethers.utils.isAddress(target)}>Revoke</button>
+            <button className="btn secondary" onClick={renounce} disabled={!inputRole}>Renounce</button>
+          </div>
+          <div className="status" style={{marginTop:10}}>{status || '—'}</div>
+        </div>
+      )
+    }
+
+    function ReadFunctions({contract}){
+      const [results, setResults] = useState({});
+
+      const views = useMemo(()=> (contract.interface.fragments.filter(f=> f.type==='function' && (f.stateMutability==='view' || f.stateMutability==='pure'))), [contract]);
+
+      const callFn = async (fn, idx, inputs)=>{
+        try{
+          const args = inputs.map(x=> x.value);
+          const res = await contract[fn.name](...args);
+          setResults(prev=>({...prev, [fn.name+idx]: String(res)}));
+        }catch(e){ setResults(prev=>({...prev, [fn.name+idx]: '❌ '+(e.reason||e.message)})); }
+      }
+
+      return (
+        <div className="card span-4">
+          <div className="row" style={{justifyContent:'space-between'}}>
+            <h3 style={{margin:0}}>Citizen</h3>
+            <span className="pill">Read-only</span>
+          </div>
+          <div className="scroll" style={{marginTop:10}}>
+            {views.length===0 && <div className="muted small">No view/pure functions in ABI.</div>}
+            {views.map((fn, idx)=> (
+              <div key={fn.name+idx} className="function" style={{marginBottom:10}}>
+                <div className="fn-title">{fn.name} <span className="muted small">({fn.inputs.length} input{fn.inputs.length!==1?'s':''})</span></div>
+                {fn.inputs.map((inp,i)=> (
+                  <div key={i}>
+                    <label>{inp.name || `arg${i}`} — <span className="mono">{inp.type}</span></label>
+                    <input data-key={`${fn.name+idx}-in-${i}`} placeholder={inp.type}/>
+                  </div>
+                ))}
+                <div className="row" style={{marginTop:8, justifyContent:'space-between', alignItems:'center'}}>
+                  <button className="btn" onClick={(e)=>{
+                    const inputs = fn.inputs.map((_,i)=> e.currentTarget.parentElement.parentElement.querySelector(`input[data-key='${fn.name+idx}-in-${i}']`));
+                    callFn(fn, idx, inputs);
+                  }}>Call</button>
+                  <div className="mono small">{results[fn.name+idx] || '—'}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    function WriteFunctions({contract, signer}){
+      const [status, setStatus] = useState("");
+
+      const writes = useMemo(()=> (contract.interface.fragments.filter(f=> f.type==='function' && !(f.stateMutability==='view' || f.stateMutability==='pure'))), [contract]);
+
+      const sendTx = async (fn, idx, inputs, payable){
+        const args = inputs.map(x=> x.value);
+        const connected = contract.connect(signer);
+        await tryTx(setStatus, ()=> payable ? connected[fn.name](...args, { value: ethers.BigNumber.from(payable) }) : connected[fn.name](...args));
+      }
+
+      return (
+        <div className="card span-4">
+          <div className="row" style={{justifyContent:'space-between'}}>
+            <h3 style={{margin:0}}>Official</h3>
+            <span className="pill">Transactions</span>
+          </div>
+          <div className="scroll" style={{marginTop:10}}>
+            {writes.length===0 && <div className="muted small">No state-changing functions in ABI.</div>}
+            {writes.map((fn, idx)=> (
+              <div key={fn.name+idx} className="function" style={{marginBottom:10}}>
+                <div className="fn-title">{fn.name} <span className="muted small">({fn.stateMutability})</span></div>
+                {fn.inputs.map((inp,i)=> (
+                  <div key={i}>
+                    <label>{inp.name || `arg${i}`} — <span className="mono">{inp.type}</span></label>
+                    <input data-key={`${fn.name+idx}-in-${i}`} placeholder={inp.type}/>
+                  </div>
+                ))}
+                {fn.stateMutability==='payable' && (
+                  <div>
+                    <label>ETH Value (wei)</label>
+                    <input data-key={`${fn.name+idx}-payable`} placeholder="0 (in wei)"/>
+                  </div>
+                )}
+                <div className="row" style={{marginTop:8, justifyContent:'space-between', alignItems:'center'}}>
+                  <button className="btn" onClick={(e)=>{
+                    const inputs = fn.inputs.map((_,i)=> e.currentTarget.parentElement.parentElement.querySelector(`input[data-key='${fn.name+idx}-in-${i}']`));
+                    const payable = fn.stateMutability==='payable' ? (e.currentTarget.parentElement.parentElement.querySelector(`input[data-key='${fn.name+idx}-payable']`)?.value || '0') : null;
+                    sendTx(fn, idx, inputs, payable);
+                  }}>Send</button>
+                  <div className="status small" style={{flex:1, marginLeft:8}}>{status || '—'}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    function ContractOverview({address, provider}){
+      const [balance, setBalance] = useState("0");
+      const [status, setStatus] = useState("");
+
+      const refresh = useCallback(async()=>{
+        try{
+          const b = await provider.getBalance(address);
+          setBalance(ethers.utils.formatEther(b));
+          setStatus('✅ Refreshed');
+          await sleep(600);
+          setStatus('');
+        }catch(e){ setStatus('❌ '+(e.message||String(e))); }
+      },[address, provider]);
+
+      useEffect(()=>{ refresh(); },[refresh]);
+
+      return (
+        <div className="card span-3">
+          <h3 style={{marginTop:0}}>Contract</h3>
+          <div className="kv">
+            <div>Address</div>
+            <div className="mono">{address}</div>
+            <div>Balance</div>
+            <div className="mono">{balance} ETH</div>
+          </div>
+          <div className="row" style={{marginTop:12}}>
+            <button className="btn secondary" onClick={refresh}>Refresh</button>
+            {status && <span className="pill">{status}</span>}
+          </div>
+        </div>
+      )
+    }
+
+    function Dashboard({loaded, provider, signer, account}){
+      const { address, abi, contract } = loaded;
+      return (
+        <div className="grid">
+          <ContractOverview address={address} provider={provider} />
+          <RolesPanel abi={abi} address={address} provider={provider} signer={signer} account={account} />
+          <ReadFunctions contract={contract} />
+          <WriteFunctions contract={contract} signer={signer} />
+        </div>
+      )
+    }
+
+    function App(){
+      const [provider, setProvider] = useState(null);
+      const [signer, setSigner] = useState(null);
+      const [account, setAccount] = useState(null);
+      const [chainId, setChainId] = useState(null);
+      const [loaded, setLoaded] = useState(null);
+      const [globalStatus, setGlobalStatus] = useState('');
+
+      const connect = useCallback(async()=>{
+        if(!window.ethereum){ alert('MetaMask not detected. Install the extension and reload.'); return; }
+        const web3Provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+        await web3Provider.send('eth_requestAccounts', []);
+        const s = web3Provider.getSigner();
+        const acct = await s.getAddress();
+        const network = await web3Provider.getNetwork();
+        setProvider(web3Provider); setSigner(s); setAccount(acct); setChainId(network.chainId);
+        setGlobalStatus(`🔗 Connected ${acct} on chain ${network.chainId}`);
+      },[]);
+
+      // Handle network/account changes
+      useEffect(()=>{
+        if(!window.ethereum) return;
+        const onAccounts = (accs)=>{ setAccount(accs?.[0] || null); };
+        const onChain = (cid)=>{ setChainId(Number(cid)); };
+        window.ethereum.on('accountsChanged', onAccounts);
+        window.ethereum.on('chainChanged', onChain);
+        return ()=>{
+          try{ window.ethereum.removeListener('accountsChanged', onAccounts); }catch{}
+          try{ window.ethereum.removeListener('chainChanged', onChain); }catch{}
         }
+      },[]);
 
-        function displayProposals() {
-            const recentContainer = document.getElementById('recentProposals');
-            const allContainer = document.getElementById('allProposals');
-            
-            const proposalHTML = proposals.map(proposal => {
-                const category = budgetCategories.find(c => c.id === proposal.categoryId);
-                return `
-                    <div class="card proposal-card ${proposal.status.toLowerCase()}">
-                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 15px;">
-                            <h3>Proposal #${proposal.id}</h3>
-                            <span class="status-badge status-${proposal.status.toLowerCase()}">${proposal.status}</span>
-                        </div>
-                        <p><strong>Category:</strong> ${category ? category.name : 'Unknown'}</p>
-                        <p><strong>Description:</strong> ${proposal.description}</p>
-                        <p><strong>Recipient:</strong> ${proposal.recipient}</p>
-                        <p><strong>Amount:</strong> ${proposal.requestedAmount} ETH</p>
-                        <p><strong>Paid:</strong> ${proposal.amountPaid} ETH</p>
-                        
-                        <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                            ${proposal.status === 'PENDING' ? `
-                                <button class="btn btn-success" onclick="approveProposal(${proposal.id})">Approve</button>
-                                <button class="btn btn-danger" onclick="rejectProposal(${proposal.id})">Reject</button>
-                            ` : ''}
-                            <button class="btn btn-secondary" onclick="viewProposalDetails(${proposal.id})">View Details</button>
-                            <button class="btn btn-danger" onclick="showFlagModal(${proposal.id})">Flag</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            recentContainer.innerHTML = proposalHTML;
-            allContainer.innerHTML = proposalHTML;
-        }
+      return (
+        <div className="container">
+          <Header account={account} chainId={chainId} connect={connect} />
+          {globalStatus && <div className="card status">{globalStatus}</div>}
+          <ContractLoader onLoaded={setLoaded} provider={provider || new ethers.providers.JsonRpcProvider()} />
+          {loaded && provider && signer ? (
+            <Dashboard loaded={loaded} provider={provider} signer={signer} account={account} />
+          ) : (
+            <div className="card">
+              <div className="muted">Load a contract (and connect your wallet) to enable the dashboard.</div>
+            </div>
+          )}
+          <div className="footer">💡 Pro tip: Save this file as <span class="mono">index.html</span>, open it in your browser, paste your ABI & address, and connect MetaMask.</div>
+        </div>
+      )
+    }
 
-        function updateStats() {
-            const totalBudget = budgetCategories.reduce((sum, cat) => sum + cat.totalAllocated, 0);
-            const totalSpent = budgetCategories.reduce((sum, cat) => sum + cat.totalSpent, 0);
-            const activeProposals = proposals.filter(p => p.status === 'PENDING' || p.status === 'APPROVED').length;
-            const completedProjects = proposals.filter(p => p.status === 'COMPLETED').length;
-
-            document.getElementById('totalBudget').textContent = `${totalBudget} ETH`;
-            document.getElementById('totalSpent').textContent = `${totalSpent} ETH`;
-            document.getElementById('activeProposals').textContent = activeProposals;
-            document.getElementById('completedProjects').textContent = completedProjects;
-        }
-
-        function populateCategoryDropdown() {
-            const select = document.getElementById('proposalCategory');
-            select.innerHTML = '<option value="">Select Category</option>' +
-                budgetCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
-        }
-
-        async function createBudgetCategory() {
-            const name = document.getElementById('categoryName').value;
-            const budget = document.getElementById('categoryBudget').value;
-
-            if (!name || !budget) {
-                showAlert('Please fill in all fields', 'error');
-                return;
-            }
-
-            try {
-                if (contract) {
-                    const result = await contract.methods.createBudgetCategory(name, web3.utils.toWei(budget, 'ether'))
-                        .send({ from: accounts[0] });
-                    showAlert('Budget category created successfully!', 'success');
-                } else {
-                    // Mock creation
-                    const newCategory = {
-                        id: budgetCategories.length + 1,
-                        name: name,
-                        totalAllocated: parseFloat(budget),
-                        totalSpent: 0
-                    };
-                    budgetCategories.push(newCategory);
-                    showAlert('Budget category created successfully! (Demo mode)', 'success');
-                }
-
-                document.getElementById('categoryName').value = '';
-                document.getElementById('categoryBudget').value = '';
-                updateUI();
-            } catch (error) {
-                showAlert('Error creating category: ' + error.message, 'error');
-            }
-        }
-
-        async function depositFunds() {
-            const amount = document.getElementById('depositAmount').value;
-
-            if (!amount) {
-                showAlert('Please enter an amount', 'error');
-                return;
-            }
-
-            try {
-                if (contract) {
-                    await contract.methods.depositFunds()
-                        .send({ from: accounts[0], value: web3.utils.toWei(amount, 'ether') });
-                    showAlert('Funds deposited successfully!', 'success');
-                } else {
-                    showAlert('Funds deposited successfully! (Demo mode)', 'success');
-                }
-
-                document.getElementById('depositAmount').value = '';
-            } catch (error) {
-                showAlert('Error depositing funds: ' + error.message, 'error');
-            }
-        }
-
-        async function submitProposal() {
-            const categoryId = document.getElementById('proposalCategory').value;
-            const description = document.getElementById('proposalDescription').value;
-            const recipient = document.getElementById('recipientAddress').value;
-            const amount = document.getElementById('requestedAmount').value;
-
-            if (!categoryId || !description || !recipient || !amount) {
-                showAlert('Please fill in all fields', 'error');
-                return;
-            }
-
-            try {
-                if (contract) {
-                    await contract.methods.submitProposal(categoryId, description, recipient, web3.utils.toWei(amount, 'ether'))
-                        .send({ from: accounts[0] });
-                    showAlert('Proposal submitted successfully!', 'success');
-                } else {
-                    // Mock submission
-                    const newProposal = {
-                        id: proposals.length + 1,
-                        categoryId: parseInt(categoryId),
-                        description: description,
-                        recipient: recipient,
-                        requestedAmount: parseFloat(amount),
-                        amountPaid: 0,
-                        status: 'PENDING'
-                    };
-                    proposals.push(newProposal);
-                    showAlert('Proposal submitted successfully! (Demo mode)', 'success');
-                }
-
-                // Clear form
-                document.getElementById('proposalCategory').value = '';
-                document.getElementById('proposalDescription').value = '';
-                document.getElementById('recipientAddress').value = '';
-                document.getElementById('requestedAmount').value = '';
-                updateUI();
-            } catch (error) {
-                showAlert('Error submitting proposal: ' + error.message, 'error');
-            }
-        }
-
-        async function approveProposal(proposalId) {
-            try {
-                if (contract) {
-                    await contract.methods.approveProposal(proposalId).send({ from: accounts[0] });
-                    showAlert('Proposal approved successfully!', 'success');
-                } else {
-                    const proposal = proposals.find(p => p.id === proposalId);
-                    if (proposal) {
-                        proposal.status = 'APPROVED';
-                        showAlert('Proposal approved successfully! (Demo mode)', 'success');
-                    }
-                }
-                updateUI();
-            } catch (error) {
-                showAlert('Error approving proposal: ' + error.message, 'error');
-            }
-        }
-
-        async function rejectPropo
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>
