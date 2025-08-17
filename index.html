@@ -1,87 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Government Budget Tracker</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f9;
-      color: #333;
-      padding: 20px;
-      margin: 0;
-    }
-    h2 {
-      color: #2c3e50;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-    }
-    input, button {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #2c3e50;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #1a242f;
-    }
-    .transactions {
-      margin-top: 30px;
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    .transaction {
-      border-bottom: 1px solid #eee;
-      padding: 10px 0;
-    }
-    .transaction:last-child {
-      border-bottom: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Spending Tracker</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        h1, h2, h3 {
+            color: #1a365d;
+            font-weight: 600;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1rem;
+        }
+        h2 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+            font-size: 1.75rem;
+        }
+        .section {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4c84c1;
+            box-shadow: 0 0 0 2px rgba(76, 132, 193, 0.2);
+        }
+        .button {
+            background-color: #4c84c1;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .button:hover {
+            background-color: #38669d;
+        }
+        .button:active {
+            transform: scale(0.98);
+        }
+        .button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+        .status-message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .info {
+            background-color: #e0f2fe;
+            color: #0c4a6e;
+        }
+        .project-item, .spending-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 0;
+        }
+        .project-item:last-child, .spending-item:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Government Budget Tracker</h2>
-    <button onclick="connectWallet()">Connect Wallet</button>
 
-    <h3>Allocate Budget</h3>
-    <input type="text" id="deptIdAlloc" placeholder="Department ID">
-    <input type="number" id="amountAlloc" placeholder="Amount in Wei">
-    <button onclick="allocateBudget()">Allocate Budget</button>
+    <div id="root"></div>
 
-    <h3>Spend Funds</h3>
-    <input type="text" id="deptIdSpend" placeholder="Department ID">
-    <input type="number" id="amountSpend" placeholder="Amount in Wei">
-    <input type="text" id="purposeSpend" placeholder="Purpose">
-    <button onclick="spendFunds()">Spend Funds</button>
-
-    <h3>Get Budget Details</h3>
-    <input type="text" id="deptIdDetails" placeholder="Department ID">
-    <button onclick="getBudgetDetails()">Get Details</button>
-    <div id="budgetInfo"></div>
-
-    <h3>Transaction History</h3>
-    <button onclick="loadTransactions()">Load Transactions</button>
-    <div id="transactions" class="transactions"></div>
-  </div>
-
-  <script>
-    const contractAddress = "0x02b49f6f9d1281C07F044cd9A8d383B2998d0454";
-    const contractABI = [
+    <script type="text/babel">
+        // -----------------------------------------------------------------------
+        // --- CONFIGURATION: PASTE YOUR CONTRACT ADDRESS AND ABI HERE ---
+        // -----------------------------------------------------------------------
+        const CONTRACT_ADDRESS = "0x02b49f6f9d1281C07F044cd9A8d383B2998d0454"; 
+        const ABI =  [
 	{
 		"inputs": [
 			{
@@ -116,7 +161,7 @@
 				"type": "uint256"
 			}
 		],
-		"name": "BudgetAllocated",
+"name": "BudgetAllocated",
 		"type": "event"
 	},
 	{
@@ -141,7 +186,7 @@
 				"type": "address"
 			},
 			{
-				"indexed": false,
+"indexed": false,
 				"internalType": "string",
 				"name": "purpose",
 				"type": "string"
@@ -174,7 +219,7 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
+"inputs": [
 			{
 				"internalType": "string",
 				"name": "",
@@ -207,7 +252,7 @@
 		"stateMutability": "view",
 		"type": "function"
 	},
-	{
+{
 		"inputs": [
 			{
 				"internalType": "string",
@@ -235,7 +280,7 @@
 		],
 		"stateMutability": "view",
 		"type": "function"
-	},
+},
 	{
 		"inputs": [
 			{
@@ -269,7 +314,7 @@
 			{
 				"internalType": "uint256",
 				"name": "timestamp",
-				"type": "uint256"
+"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -279,7 +324,7 @@
 		"inputs": [],
 		"name": "getTransactionCount",
 		"outputs": [
-			{
+{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
@@ -313,7 +358,7 @@
 				"name": "spender",
 				"type": "address"
 			},
-			{
+{
 				"internalType": "string",
 				"name": "purpose",
 				"type": "string"
@@ -327,93 +372,211 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-]; // Paste your ABI array here
+];
+        // -----------------------------------------------------------------------
 
-    let web3;
-    let contract;
-    let accounts;
+        const { useEffect, useState } = React;
+        const roleMap = { 0: "NONE", 1: "CONTRACTOR", 2: "AUDITOR", 3: "PUBLIC" };
 
-    async function connectWallet() {
-      try {
-        if (window.ethereum) {
-          web3 = new Web3(window.ethereum);
-          await window.ethereum.request({ method: "eth_requestAccounts" });
-          accounts = await web3.eth.getAccounts();
-          contract = new web3.eth.Contract(contractABI, contractAddress);
-          alert("Wallet connected: " + accounts[0]);
-        } else {
-          alert("MetaMask not detected. Please install MetaMask.");
-        }
-      } catch (error) {
-        console.error("Failed to connect to MetaMask", error);
-        alert("Failed to connect to MetaMask");
-      }
-    }
+        const App = () => {
+            const [account, setAccount] = useState("");
+            const [contract, setContract] = useState(null);
+            const [userRole, setUserRole] = useState("NONE");
+            const [status, setStatus] = useState({ message: "", type: "" });
+            const [projects, setProjects] = useState([]);
+            const [spendings, setSpendings] = useState([]);
 
-    async function allocateBudget() {
-      try {
-        const deptId = document.getElementById("deptIdAlloc").value;
-        const amount = document.getElementById("amountAlloc").value;
-        await contract.methods.allocateBudget(deptId, amount).send({ from: accounts[0] });
-        alert("Budget allocated");
-      } catch (err) {
-        console.error(err);
-        alert("Error allocating budget");
-      }
-    }
+            useEffect(() => {
+                checkWalletConnection();
+            }, []);
 
-    async function spendFunds() {
-      try {
-        const deptId = document.getElementById("deptIdSpend").value;
-        const amount = document.getElementById("amountSpend").value;
-        const purpose = document.getElementById("purposeSpend").value;
-        await contract.methods.spendFunds(deptId, amount, purpose).send({ from: accounts[0] });
-        alert("Funds spent");
-      } catch (err) {
-        console.error(err);
-        alert("Error spending funds");
-      }
-    }
+            useEffect(() => {
+                if (account && contract) {
+                    fetchData();
+                }
+            }, [account, contract]);
 
-    async function getBudgetDetails() {
-      try {
-        const deptId = document.getElementById("deptIdDetails").value;
-        const result = await contract.methods.getBudgetDetails(deptId).call();
-        document.getElementById("budgetInfo").innerHTML = `
-          <p><strong>Allocated:</strong> ${result.allocated} Wei</p>
-          <p><strong>Spent:</strong> ${result.spent} Wei</p>
-          <p><strong>Remaining:</strong> ${result.remaining} Wei</p>
-        `;
-      } catch (err) {
-        console.error(err);
-        alert("Error fetching budget details");
-      }
-    }
+            const setStatusMessage = (message, type) => {
+                setStatus({ message, type });
+                setTimeout(() => setStatus({ message: "", type: "" }), 5000);
+            };
 
-    async function loadTransactions() {
-      try {
-        const txCount = await contract.methods.getTransactionCount().call();
-        const container = document.getElementById("transactions");
-        container.innerHTML = "";
-        for (let i = 0; i < txCount; i++) {
-          const tx = await contract.methods.getTransaction(i).call();
-          const timestamp = Number(tx.timestamp);
-          const dateStr = isNaN(timestamp) ? "N/A" : new Date(timestamp * 1000).toLocaleString();
-          container.innerHTML += `
-            <div class="transaction">
-              <p><strong>Dept:</strong> ${tx.deptId}</p>
-              <p><strong>Amount:</strong> ${tx.amount} Wei</p>
-              <p><strong>Spender:</strong> ${tx.spender}</p>
-              <p><strong>Purpose:</strong> ${tx.purpose}</p>
-              <p><strong>Time:</strong> ${dateStr}</p>
-            </div>
-          `;
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Error loading transactions");
-      }
-    }
-  </script>
+            const checkWalletConnection = async () => {
+                try {
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    const signer = provider.getSigner();
+                    const address = await signer.getAddress();
+                    setAccount(address);
+
+                    const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+                    setContract(contractInstance);
+
+                    window.ethereum.on('accountsChanged', (accounts) => {
+                        if (accounts.length > 0) {
+                            setAccount(accounts[0]);
+                        } else {
+                            setAccount("");
+                        }
+                    });
+                } catch (error) {
+                    setStatusMessage(`Error connecting wallet: ${error.message}`, "error");
+                }
+            };
+            
+            const fetchData = async () => {
+                if (!contract || !account) return;
+                try {
+                    const authorityAddress = await contract.authority();
+                    const userRoleCode = await contract.userRoles(account);
+                    if (account.toLowerCase() === authorityAddress.toLowerCase()) {
+                        setUserRole("AUTHORITY");
+                    } else {
+                        setUserRole(roleMap[userRoleCode]);
+                    }
+
+                    const allProjects = await contract.projects();
+                    setProjects(allProjects.filter(p => p.exists)); // Filter out non-existent projects
+                    
+                    const allSpendings = await contract.spendings();
+                    setSpendings(allSpendings);
+                } catch (error) {
+                    setStatusMessage(`Error fetching data: ${error.message}`, "error");
+                    console.error("Error fetching data:", error);
+                }
+            };
+            
+            const allocateBudget = async (e) => {
+                e.preventDefault();
+                const name = e.target.name.value;
+                const amount = ethers.utils.parseEther(e.target.amount.value);
+                setStatusMessage("Allocating budget...", "info");
+                try {
+                    const tx = await contract.allocateBudget(name, amount);
+                    await tx.wait();
+                    setStatusMessage("Budget allocated successfully!", "success");
+                    fetchData();
+                } catch (error) {
+                    setStatusMessage(`Error: ${error.message}`, "error");
+                }
+            };
+
+            const logSpending = async (e) => {
+                e.preventDefault();
+                const projectId = e.target.projectId.value;
+                const amount = ethers.utils.parseEther(e.target.amount.value);
+                const description = e.target.description.value;
+                const receiver = e.target.receiver.value;
+                setStatusMessage("Logging spending...", "info");
+                try {
+                    const tx = await contract.logSpending(projectId, amount, description, receiver);
+                    await tx.wait();
+                    setStatusMessage("Spending logged successfully!", "success");
+                    fetchData();
+                } catch (error) {
+                    setStatusMessage(`Error: ${error.message}`, "error");
+                }
+            };
+
+            return (
+                <div className="container">
+                    <h1>Government Spending Tracker</h1>
+                    <div className="section">
+                        <h2>Wallet & Role Info</h2>
+                        <p><strong>Connected Account:</strong> {account || "Not connected"}</p>
+                        <p><strong>Your Role:</strong> {userRole}</p>
+                        {!account && (
+                            <button className="button" onClick={checkWalletConnection}>Connect Wallet</button>
+                        )}
+                        {status.message && (
+                            <div className={`status-message ${status.type}`}>
+                                {status.message}
+                            </div>
+                        )}
+                    </div>
+
+                    {userRole === "AUTHORITY" && (
+                        <div className="section">
+                            <h2>🏛️ Authority Dashboard</h2>
+                            <form onSubmit={allocateBudget}>
+                                <h3>Allocate New Budget</h3>
+                                <div className="form-group">
+                                    <label>Project Name:</label>
+                                    <input type="text" name="name" required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Budget Amount (ETH):</label>
+                                    <input type="number" step="0.01" name="amount" required />
+                                </div>
+                                <button className="button" type="submit">Allocate Budget</button>
+                            </form>
+                        </div>
+                    )}
+                    
+                    {(userRole === "CONTRACTOR" || userRole === "AUDITOR") && (
+                        <div className="section">
+                            <h2>✍️ Authorized Actions</h2>
+                            <form onSubmit={logSpending}>
+                                <h3>Log Spending for a Project</h3>
+                                <div className="form-group">
+                                    <label>Project ID:</label>
+                                    <input type="number" name="projectId" required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Amount Spent (ETH):</label>
+                                    <input type="number" step="0.01" name="amount" required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Description:</label>
+                                    <textarea name="description" required></textarea>
+                                </div>
+                                <div className="form-group">
+                                    <label>Receiver Address:</label>
+                                    <input type="text" name="receiver" required />
+                                </div>
+                                <button className="button" type="submit">Log Spending</button>
+                            </form>
+                        </div>
+                    )}
+
+                    <div className="section">
+                        <h2>📊 Public Project Budgets</h2>
+                        {projects.length === 0 ? (
+                            <p>No projects have been created yet.</p>
+                        ) : (
+                            projects.map((p, index) => (
+                                <div key={index} className="project-item">
+                                    <h3>Project ID: {index} - {p.name}</h3>
+                                    <p><strong>Total Budget:</strong> {ethers.utils.formatEther(p.totalBudget)} ETH</p>
+                                    <p><strong>Amount Spent:</strong> {ethers.utils.formatEther(p.spentAmount)} ETH</p>
+                                    <p><strong>Remaining:</strong> {ethers.utils.formatEther(p.totalBudget.sub(p.spentAmount))} ETH</p>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    <div className="section">
+                        <h2>🧾 Public Spending Logs</h2>
+                        {spendings.length === 0 ? (
+                            <p>No spending has been logged yet.</p>
+                        ) : (
+                            spendings.map((s, index) => (
+                                <div key={index} className="spending-item">
+                                    <p><strong>Log ID:</strong> {index}</p>
+                                    <p><strong>Project ID:</strong> {s.projectId.toString()}</p>
+                                    <p><strong>Amount:</strong> {ethers.utils.formatEther(s.amount)} ETH</p>
+                                    <p><strong>Description:</strong> {s.description}</p>
+                                    <p><strong>Receiver:</strong> {s.receiver}</p>
+                                    <p><strong>Timestamp:</strong> {new Date(s.timestamp.toNumber() * 1000).toLocaleString()}</p>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
 </body>
 </html>
